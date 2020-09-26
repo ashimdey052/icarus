@@ -4,8 +4,10 @@ Overview
 ========
 
 This reference configuration file is divided into two parts.
+
 The first part lists generic simulation parameters such as number of processes
 to use, logging configuration and so on.
+
 The second part builds an "experiment queue", i.e. a queue of configuration
 parameters each representing one single experiment.
 
