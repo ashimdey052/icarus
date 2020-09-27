@@ -4,7 +4,7 @@ from collections import deque
 import copy
 from icarus.util import Tree
 
-# GENERAL SETTINGS
+# *****************GENERAL SETTINGS************
 
 # Level of logging output
 # Available options: DEBUG, INFO, WARNING, ERROR, CRITICAL
@@ -34,6 +34,9 @@ RESULTS_FORMAT = 'PICKLE'
 # The implementation of data collectors are located in ./icarus/execution/collectors.py
 DATA_COLLECTORS = ['CACHE_HIT_RATIO', 'LATENCY']
 
+#************Experiement Configuration*********************
+
+
 # Queue of experiments
 EXPERIMENT_QUEUE = deque()
 
@@ -41,14 +44,20 @@ EXPERIMENT_QUEUE = deque()
 experiment = Tree()
 
 # Set topology
+#Topology types : Path(n number of nodes);Tree(h hieght, k branching factor)
+
 experiment['topology']['name'] = 'PATH'
 experiment['topology']['n'] = 10
 experiment['topology']['delay'] = 10
 
+# experiment['topology']['name'] = 'TREE'
+# experiment['topology']['h'] = 5
+# experiment['topology']['k'] = 2
+
 # Set workload
 experiment['workload'] = {
-         'name':       'STATIONARY',
-         'n_contents': 10 ** 5,
+         'name':       'STATIONARY', #Zipf workload
+         'n_contents': 10 ** 5,      
          'n_warmup':   10 ** 2,
          'n_measured': 4 * 10 ** 2,
          'alpha':      1.0,
@@ -56,10 +65,13 @@ experiment['workload'] = {
                        }
 
 # Set cache placement
+#Cache space uniformly distributed among cache nodes
 experiment['cache_placement']['name'] = 'UNIFORM'
+#Total network cache space = (100 x 0.01) % of content space
 experiment['cache_placement']['network_cache'] = 0.01
 
 # Set content placement
+# Content uniformly distrubted among servers
 experiment['content_placement']['name'] = 'UNIFORM'
 
 # Set cache replacement policy

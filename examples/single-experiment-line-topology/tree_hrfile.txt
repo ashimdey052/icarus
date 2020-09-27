@@ -1,0 +1,18 @@
+EXPERIMENT 1/1:
+  CONFIGURATION:
+   * topology -> name: TREE, h: 5, k: 2
+   * workload -> name: STATIONARY, n_contents: 100000, n_warmup: 100, n_measured: 400, alpha: 1.0, rate: 1
+   * cache_placement -> name: UNIFORM, network_cache: 0.01
+   * content_placement -> name: UNIFORM
+   * cache_policy -> name: LRU
+   * strategy -> name: LCE
+   * desc -> Line topology with 10 nodes
+  RESULTS:
+    CACHE_HIT_RATIO
+     * MEAN: 0.2375
+     * PER_NODE_CACHE_HIT_RATIO: Tree({1: 0.0125, 24: 0.0075, 11: 0.005, 19: 0.005, 13: 0.005, 3: 0.0125, 4: 0.0125, 2: 0.0125, 26: 0.005, 21: 0.0125, 29: 0.0125, 18: 0.0075, 10: 0.01, 6: 0.0125, 27: 0.005, 14: 0.0075, 23: 0.005, 12: 0.0075, 25: 0.01, 22: 0.0125, 5: 0.0075, 28: 0.0075, 20: 0.0125, 17: 0.0075, 15: 0.0125, 9: 0.005, 16: 0.0025, 30: 0.0025})
+     * PER_NODE_SERVER_HIT_RATIO: Tree({0: 0.7625})
+    LATENCY
+     * MEAN: 8.51
+
+
