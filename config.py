@@ -74,7 +74,7 @@ all parameters for each of them
 topology
 --------
 
-Path topology
+Path topology  # There is a path from server to all other nodes for sure
  * name: PATH
  * args:
     * n: number of nodes

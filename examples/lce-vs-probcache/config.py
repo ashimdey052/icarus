@@ -43,11 +43,19 @@ default['cache_policy']['name'] = 'LRU'
 
 # Specify topology
 default['topology']['name'] = 'ROCKET_FUEL'
-default['topology']['asn'] = 1221
+default['topology']['asn'] = 1221       # ASN=Assigned Number of a net-top; node:108 (source node 10)
 
 # Create experiments multiplexing all desired parameters
-for strategy in ['LCE', 'PROB_CACHE']:
+# for strategy in ['LCE', 'PROB_CACHE']:
+#     experiment = copy.deepcopy(default)
+#     experiment['strategy']['name'] = strategy
+#     experiment['desc'] = "Strategy: %s" % strategy
+#     EXPERIMENT_QUEUE.append(experiment)
+
+#Create experiments multiplexing all desired parameters for NO_CACHE & RAND_CHOICE
+for strategy in ['NO_CACHE', 'RAND_CHOICE']:
     experiment = copy.deepcopy(default)
     experiment['strategy']['name'] = strategy
     experiment['desc'] = "Strategy: %s" % strategy
     EXPERIMENT_QUEUE.append(experiment)
+

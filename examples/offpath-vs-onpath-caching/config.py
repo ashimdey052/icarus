@@ -101,7 +101,7 @@ CACHE_POLICY = 'LRU'
 # Queue of experiments
 EXPERIMENT_QUEUE = deque()
 default = Tree()
-default['workload'] = {'name':       'STATIONARY',
+default['workload'] = {'name':       'STATIONARY', #Zipfs Distribution
                        'n_contents': N_CONTENTS,
                        'n_warmup':   N_WARMUP_REQUESTS,
                        'n_measured': N_MEASURED_REQUESTS,
@@ -112,15 +112,31 @@ default['content_placement']['name'] = 'UNIFORM'
 default['cache_policy']['name'] = CACHE_POLICY
 
 # Create experiments multiplexing all desired parameters
-for alpha in ALPHA:
-    for strategy in STRATEGIES:
-        for topology in TOPOLOGIES:
-            for network_cache in NETWORK_CACHE:
-                experiment = copy.deepcopy(default)
-                experiment['workload']['alpha'] = alpha
-                experiment['strategy']['name'] = strategy
-                experiment['topology']['name'] = topology
-                experiment['cache_placement']['network_cache'] = network_cache
-                experiment['desc'] = "Alpha: %s, strategy: %s, topology: %s, network cache: %s" \
-                                     % (str(alpha), strategy, topology, str(network_cache))
-                EXPERIMENT_QUEUE.append(experiment)
+# for alpha in ALPHA:
+#     for strategy in STRATEGIES:
+#         for topology in TOPOLOGIES:
+#             for network_cache in NETWORK_CACHE:
+#                 experiment = copy.deepcopy(default)
+#                 experiment['workload']['alpha'] = alpha
+#                 experiment['strategy']['name'] = strategy
+#                 experiment['topology']['name'] = topology
+#                 experiment['cache_placement']['network_cache'] = network_cache
+#                 experiment['desc'] = "Alpha: %s, strategy: %s, topology: %s, network cache: %s" \
+#                                      % (str(alpha), strategy, topology, str(network_cache))
+#                 EXPERIMENT_QUEUE.append(experiment)
+
+
+################### Ashim Added  ######################
+#for alpha in ALPHA:
+for strategy in STRATEGIES:
+        #for topology in TOPOLOGIES:
+           # for network_cache in NETWORK_CACHE:
+    experiment = copy.deepcopy(default)
+    experiment['workload']['alpha'] = 0.6
+    experiment['strategy']['name'] = strategy
+    experiment['topology']['name'] = 'WIDE'
+    experiment['cache_placement']['network_cache'] = 0.01
+    experiment['desc'] = "Alpha: %s, strategy: %s, topology: %s, network cache: %s" \
+                          % (str(0.6), strategy, 'WIDE', str(0.01))
+    EXPERIMENT_QUEUE.append(experiment)
+
