@@ -30,7 +30,7 @@ RESULTS_FORMAT = 'PICKLE'
 
 # Number of times each experiment is replicated
 # This is necessary for extracting confidence interval of selected metrics
-N_REPLICATIONS = 2
+N_REPLICATIONS = 1 #2
 
 # List of metrics to be measured in the experiments
 # The implementation of data collectors are located in ./icarus/execution/collectors.py
@@ -70,10 +70,10 @@ N_MEASURED_REQUESTS = 6 * 10 ** 5
 # List of all implemented topologies
 # Topology implementations are located in ./icarus/scenarios/topology.py
 TOPOLOGIES = [
-        'GEANT',
-        'WIDE',
-        'GARR',
-        'TISCALI',
+        #'GEANT',
+        'WIDE'#,
+       # 'GARR',
+        #'TISCALI',
               ]
 
 # List of caching and routing strategies
@@ -84,13 +84,13 @@ STRATEGIES = [
      'HR_SYMM',  # Symmetric hash-routing
      'HR_ASYMM',  # Asymmetric hash-routing
      'HR_MULTICAST',  # Multicast hash-routing
-     'HR_HYBRID_AM',  # Hybrid Asymm-Multicast hash-routing
-     'HR_HYBRID_SM',  # Hybrid Symm-Multicast hash-routing
+     # 'HR_HYBRID_AM',  # Hybrid Asymm-Multicast hash-routing
+     # 'HR_HYBRID_SM',  # Hybrid Symm-Multicast hash-routing
      'CL4M',  # Cache less for more
      'PROB_CACHE',  # ProbCache
      'LCD',  # Leave Copy Down
      'RAND_CHOICE',  # Random choice: cache in one random cache on path
-     'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
+     #'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
              ]
 
 # Cache replacement policy used by the network caches.
@@ -127,16 +127,52 @@ default['cache_policy']['name'] = CACHE_POLICY
 
 
 ################### Ashim Added  ######################
-#for alpha in ALPHA:
-for strategy in STRATEGIES:
-        #for topology in TOPOLOGIES:
-           # for network_cache in NETWORK_CACHE:
-    experiment = copy.deepcopy(default)
-    experiment['workload']['alpha'] = 0.6
-    experiment['strategy']['name'] = strategy
-    experiment['topology']['name'] = 'WIDE'
-    experiment['cache_placement']['network_cache'] = 0.01
-    experiment['desc'] = "Alpha: %s, strategy: %s, topology: %s, network cache: %s" \
-                          % (str(0.6), strategy, 'WIDE', str(0.01))
-    EXPERIMENT_QUEUE.append(experiment)
+# #for alpha in ALPHA:
+# for strategy in STRATEGIES:
+#         #for topology in TOPOLOGIES:
+#            # for network_cache in NETWORK_CACHE:
+#     experiment = copy.deepcopy(default)
+#     experiment['workload']['alpha'] = 0.6
+#     experiment['strategy']['name'] = strategy
+#     experiment['topology']['name'] = 'WIDE'
+#     experiment['cache_placement']['network_cache'] = 0.01
+#     experiment['desc'] = "Alpha: %s, strategy: %s, topology: %s, network cache: %s" \
+#                           % (str(0.6), strategy, 'WIDE', str(0.01))
+#     EXPERIMENT_QUEUE.append(experiment)
+
+#################### Added by Ashim 2nd ################
+
+#Create experiments multiplexing all desired parameters 9*4*4=144 simulation
+for alpha in ALPHA:
+    for strategy in STRATEGIES:
+        for topology in TOPOLOGIES:
+            for network_cache in NETWORK_CACHE:
+                experiment = copy.deepcopy(default)
+                experiment['workload']['alpha'] = alpha
+                experiment['strategy']['name'] = strategy
+                experiment['topology']['name'] = topology# JAPAN
+                experiment['cache_placement']['network_cache'] = network_cache
+                experiment['desc'] = "Alpha: %s, strategy: %s, topology: %s, network cache: %s" \
+                                      % (str(alpha), strategy, topology, str(network_cache))
+                EXPERIMENT_QUEUE.append(experiment)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

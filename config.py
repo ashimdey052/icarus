@@ -85,14 +85,14 @@ Tree topology
     * h: height
     * k: branching factor #max children at each node
 
-RocketFuel topologies
+RocketFuel topologies #Country Real ISP provider network scenerio
  * name: ROCKET_FUEL
  * args:
      * asn: ASN of topology selected (see resources/README.md for further info)
      * source_ratio: ratio of nodes to which attach a content source
      * ext_delay: delay of interdomain links
 
-Internet Topology Zoo topologies
+Internet Topology Zoo topologies #Data set based on manual transcription of public network maps
  * name: GARR, GEANT, TISCALI, WIDE, GEANT_2, GARR_2, TISCALI_2
  * args: None
 
@@ -103,7 +103,7 @@ workload
 Stationary Zipf workload
  * name: STATIONARY
  * args:
-    * alpha : float, the Zipf alpha parameter
+    * alpha : float, the Zipf alpha parameter # confidence interval,shape parameter, popularity
     * n_contents: number of content objects
     * n_warmup: number of warmup requests
     * n_measured: number of measured requests
@@ -233,7 +233,7 @@ DATA_COLLECTORS = [
            'CACHE_HIT_RATIO',  # Measure cache hit ratio
            'LATENCY',  # Measure request and response latency (based on static link delays)
            'LINK_LOAD',  # Measure link loads
-           'PATH_STRETCH',  # Measure path stretch
+           'PATH_STRETCH',  # Measure path stretch #Path stretch rate is defined as the extra number of hops
                    ]
 
 
@@ -300,7 +300,7 @@ EXPERIMENT_QUEUE = deque()
 # Build a default experiment configuration which is going to be used by all
 # experiments of the campaign
 default = Tree()
-default['workload'] = {'name':       'STATIONARY',#Zi
+default['workload'] = {'name':       'STATIONARY',#Zifps_law
                        'n_contents': N_CONTENTS,
                        'n_warmup':   N_WARMUP_REQUESTS,
                        'n_measured': N_MEASURED_REQUESTS,

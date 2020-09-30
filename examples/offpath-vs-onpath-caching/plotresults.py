@@ -45,14 +45,14 @@ STRATEGY_STYLE = {
          'HR_SYMM':         'b-o',
          'HR_ASYMM':        'g-D',
          'HR_MULTICAST':    'm-^',
-         'HR_HYBRID_AM':    'c-s',
-         'HR_HYBRID_SM':    'r-v',
+         #'HR_HYBRID_AM':    'c-s',
+        #'HR_HYBRID_SM':    'r-v',
          'LCE':             'b--p',
          'LCD':             'g-->',
          'CL4M':            'g-->',
          'PROB_CACHE':      'c--<',
          'RAND_CHOICE':     'r--<',
-         'RAND_BERNOULLI':  'g--*',
+         #'RAND_BERNOULLI':  'g--*',
          'NO_CACHE':        'k:o',
          'OPTIMAL':         'k-o'
                 }
@@ -64,12 +64,12 @@ STRATEGY_LEGEND = {
          'HR_SYMM':         'HR Symm',
          'HR_ASYMM':        'HR Asymm',
          'HR_MULTICAST':    'HR Multicast',
-         'HR_HYBRID_AM':    'HR Hybrid AM',
-         'HR_HYBRID_SM':    'HR Hybrid SM',
+        #'HR_HYBRID_AM':    'HR Hybrid AM',
+         #'HR_HYBRID_SM':    'HR Hybrid SM',
          'CL4M':            'CL4M',
          'PROB_CACHE':      'ProbCache',
          'RAND_CHOICE':     'Random (choice)',
-         'RAND_BERNOULLI':  'Random (Bernoulli)',
+        # 'RAND_BERNOULLI':  'Random (Bernoulli)',
          'NO_CACHE':        'No caching',
          'OPTIMAL':         'Optimal'
                     }
@@ -98,7 +98,7 @@ def plot_cache_hits_vs_alpha(resultset, topology, cache_size, alpha_range, strat
     desc = {}
     desc['title'] = 'Cache hit ratio: T=%s C=%s' % (topology, cache_size)
     desc['ylabel'] = 'Cache hit ratio'
-    desc['xlabel'] = u'Content distribution \u03b1'
+    desc['xlabel'] = u'Content distribution \u03b1' # \u03b1=alpha
     desc['xparam'] = ('workload', 'alpha')
     desc['xvals'] = alpha_range
     desc['filter'] = {'topology': {'name': topology},
@@ -297,7 +297,7 @@ def run(config, results, plotdir):
         The directory into which graphs will be saved
     """
     settings = Settings()
-    settings.read_from(config)
+    settings.read_from(config) #config.py
     config_logging(settings.LOG_LEVEL)
     resultset = RESULTS_READER[settings.RESULTS_FORMAT](results)
     # Create dir if not existsing
@@ -310,7 +310,7 @@ def run(config, results, plotdir):
     strategies = settings.STRATEGIES
     # Plot graphs
     for topology in topologies:
-        for cache_size in cache_sizes:
+        for cache_size in cache_sizes: #cache_hit VS alpha
             logger.info('Plotting cache hit ratio for topology %s and cache size %s vs alpha' % (topology, str(cache_size)))
             plot_cache_hits_vs_alpha(resultset, topology, cache_size, alphas, strategies, plotdir)
             logger.info('Plotting link load for topology %s vs cache size %s' % (topology, str(cache_size)))

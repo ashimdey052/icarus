@@ -46,13 +46,13 @@ experiment = Tree()
 # Set topology
 #Topology types : Path(n number of nodes);Tree(h hieght, k branching factor)
 
-experiment['topology']['name'] = 'PATH'
-experiment['topology']['n'] = 10
-experiment['topology']['delay'] = 10
+# experiment['topology']['name'] = 'PATH'
+# experiment['topology']['n'] = 10
+# experiment['topology']['delay'] = 10
 
-# experiment['topology']['name'] = 'TREE'
-# experiment['topology']['h'] = 5
-# experiment['topology']['k'] = 2
+experiment['topology']['name'] = 'TREE' # 31 nodes (30 cache+1 server)
+experiment['topology']['h'] = 5
+experiment['topology']['k'] = 2
 
 # Set workload
 experiment['workload'] = {
