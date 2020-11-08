@@ -71,13 +71,14 @@ class NoCache(Strategy):
     @inheritdoc(Strategy)
     def process_event(self, time, receiver, content, log):
         # get all required data
-        source = self.view.content_source(content)
-        path = self.view.shortest_path(receiver, source)
+        source = self.view.content_source(content)                              #get source of the content
+        path = self.view.shortest_path(receiver, source)                        #get st path from receiver to source
         # Route requests to original source
-        self.controller.start_session(time, receiver, content, log)
-        self.controller.forward_request_path(receiver, source)
-        self.controller.get_content(source)
+        self.controller.start_session(time, receiver, content, log)             #requested - start clock
+        self.controller.forward_request_path(receiver, source)                  #forword req to source
+        self.controller.get_content(source)                                     #get content from source
         # Route content back to receiver
-        path = list(reversed(path))
-        self.controller.forward_content_path(source, receiver, path)
-        self.controller.end_session()
+        path = list(reversed(path))                                             #create return path to receiver
+        self.controller.forward_content_path(source, receiver, path)            # send the content to receiver
+        self.controller.end_session()                                           # content received - stop clock
+

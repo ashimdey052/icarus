@@ -1,0 +1,144 @@
+EXPERIMENT 1/6:
+  CONFIGURATION:
+   * workload -> name: STATIONARY, alpha: 0.8, n_contents: 100000, n_warmup: 100000, n_measured: 400000, rate: 1.0
+   * topology -> name: ROCKET_FUEL, asn: 1221
+   * cache_placement -> name: UNIFORM, network_cache: 0.01
+   * content_placement -> name: UNIFORM
+   * cache_policy -> name: LRU
+   * strategy -> name: NO_CACHE
+   * desc -> Strategy: NO_CACHE 
+  RESULTS:
+    CACHE_HIT_RATIO
+     * MEAN: 0.0
+     * PER_NODE_CACHE_HIT_RATIO: Tree({})
+     * PER_NODE_SERVER_HIT_RATIO: Tree({'src_3': 0.09493, 'src_6': 0.1004725, 'src_0': 0.0994125, 'src_9': 0.0885575, 'src_8': 0.0965975, 'src_5': 0.09783, 'src_4': 0.1102925, 'src_7': 0.099305, 'src_2': 0.125495, 'src_1': 0.0871075})
+    LATENCY
+     * MEAN: 91.62739
+    LINK_LOAD
+     * MEAN_INTERNAL: 15.54974431249913
+     * MEAN_EXTERNAL: 82.34174576200047
+    
+    PATH_STRETCH
+     * MEAN: 0.8426278613798981
+     * MEAN_REQUEST: 0.8426278613798981
+     * MEAN_CONTENT: 0.8426278613798981
+
+EXPERIMENT 2/6:
+  CONFIGURATION:
+   * workload -> name: STATIONARY, alpha: 0.8, n_contents: 100000, n_warmup: 100000, n_measured: 400000, rate: 1.0
+   * topology -> name: ROCKET_FUEL, asn: 1221
+   * cache_placement -> name: UNIFORM, network_cache: 0.01
+   * content_placement -> name: UNIFORM
+   * cache_policy -> name: LRU
+   * strategy -> name: LCD
+   * desc -> Strategy: LCD 
+  RESULTS:
+    CACHE_HIT_RATIO
+     * MEAN: 0.097595
+     
+    LATENCY
+     * MEAN: 83.23272
+    LINK_LOAD
+     * MEAN_INTERNAL: 14.691976908449766
+     * MEAN_EXTERNAL: 74.39747548474976
+   
+    PATH_STRETCH
+     * MEAN: 0.7945439824118526
+     * MEAN_REQUEST: 0.7945439824118526
+     * MEAN_CONTENT: 0.7945439824118526
+
+EXPERIMENT 3/6:
+  CONFIGURATION:
+   * workload -> name: STATIONARY, alpha: 0.8, n_contents: 100000, n_warmup: 100000, n_measured: 400000, rate: 1.0
+   * topology -> name: ROCKET_FUEL, asn: 1221
+   * cache_placement -> name: UNIFORM, network_cache: 0.01
+   * content_placement -> name: UNIFORM
+   * cache_policy -> name: LRU
+   * strategy -> name: RAND_CHOICE
+   * desc -> Strategy: RAND_CHOICE 
+  RESULTS:
+    CACHE_HIT_RATIO
+     * MEAN: 0.0716325
+    
+     * MEAN: 85.795925
+    LINK_LOAD
+     * MEAN_INTERNAL: 15.115614935575318
+     * MEAN_EXTERNAL: 76.6757008250986
+    
+    PATH_STRETCH
+     * MEAN: 0.8156941646808544
+     * MEAN_REQUEST: 0.8156941646808544
+     * MEAN_CONTENT: 0.8156941646808544
+
+EXPERIMENT 4/6:
+  CONFIGURATION:
+   * workload -> name: STATIONARY, alpha: 0.8, n_contents: 100000, n_warmup: 100000, n_measured: 400000, rate: 1.0
+   * topology -> name: ROCKET_FUEL, asn: 1221
+   * cache_placement -> name: UNIFORM, network_cache: 0.01
+   * content_placement -> name: UNIFORM
+   * cache_policy -> name: LRU
+   * strategy -> name: LCE
+   * desc -> Strategy: LCE 
+  RESULTS:
+    CACHE_HIT_RATIO
+     * MEAN: 0.0426125
+     
+    LATENCY
+     * MEAN: 88.09046
+    LINK_LOAD
+     * MEAN_INTERNAL: 15.249824861792705
+     * MEAN_EXTERNAL: 79.10772079905313
+  
+    PATH_STRETCH
+     * MEAN: 0.8259624578806682
+     * MEAN_REQUEST: 0.8259624578806682
+     * MEAN_CONTENT: 0.8259624578806682
+
+EXPERIMENT 5/6:
+  CONFIGURATION:
+   * workload -> name: STATIONARY, alpha: 0.8, n_contents: 100000, n_warmup: 100000, n_measured: 400000, rate: 1.0
+   * topology -> name: ROCKET_FUEL, asn: 1221
+   * cache_placement -> name: UNIFORM, network_cache: 0.01
+   * content_placement -> name: UNIFORM
+   * cache_policy -> name: LRU
+   * strategy -> name: CL4M
+   * desc -> Strategy: CL4M 
+  RESULTS:
+    CACHE_HIT_RATIO
+     * MEAN: 0.09342
+    
+    LATENCY
+     * MEAN: 83.70562
+    LINK_LOAD
+     * MEAN_INTERNAL: 14.758134017447054
+     * MEAN_EXTERNAL: 74.78373866285312
+    
+    PATH_STRETCH
+     * MEAN: 0.7954857528843888
+     * MEAN_REQUEST: 0.7954857528843888
+     * MEAN_CONTENT: 0.7954857528843888
+
+EXPERIMENT 6/6:
+  CONFIGURATION:
+   * workload -> name: STATIONARY, alpha: 0.8, n_contents: 100000, n_warmup: 100000, n_measured: 400000, rate: 1.0
+   * topology -> name: ROCKET_FUEL, asn: 1221
+   * cache_placement -> name: UNIFORM, network_cache: 0.01
+   * content_placement -> name: UNIFORM
+   * cache_policy -> name: LRU
+   * strategy -> name: PROB_CACHE
+   * desc -> Strategy: PROB_CACHE 
+  RESULTS:
+    CACHE_HIT_RATIO
+     * MEAN: 0.079175
+     
+    LATENCY
+     * MEAN: 85.486755
+    LINK_LOAD
+     * MEAN_INTERNAL: 15.203770324008758
+     * MEAN_EXTERNAL: 76.15121870512542
+    PATH_STRETCH
+     * MEAN: 0.8160887871555926
+     * MEAN_REQUEST: 0.8160887871555926
+     * MEAN_CONTENT: 0.8160887871555926
+
+

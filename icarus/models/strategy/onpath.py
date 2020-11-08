@@ -25,9 +25,9 @@ __all__ = [
 class Partition(Strategy):
     """Partition caching strategy.
 
-    In this strategy the network is divided into as many partitions as the number
-    of caching nodes and each receiver is statically mapped to one and only one
-    caching node. When a request is issued it is forwarded to the cache mapped
+    In this strategy the network is divided into as many @@partitions@@ as the number
+    of caching nodes and each receiver is statically mapped to one and @@only one
+    caching node@@. When a request is issued it is forwarded to the cache mapped
     to the receiver. In case of a miss the request is routed to the source and
     then returned to cache, which will store it and forward it back to the
     receiver.
@@ -51,24 +51,24 @@ class Partition(Strategy):
 
     @inheritdoc(Strategy)
     def process_event(self, time, receiver, content, log):
-        source = self.view.content_source(content)
-        self.controller.start_session(time, receiver, content, log)
-        cache = self.cache_assignment[receiver]
-        self.controller.forward_request_path(receiver, cache)
-        if not self.controller.get_content(cache):
-            self.controller.forward_request_path(cache, source)
-            self.controller.get_content(source)
-            self.controller.forward_content_path(source, cache)
-            self.controller.put_content(cache)
-        self.controller.forward_content_path(cache, receiver)
-        self.controller.end_session()
+        source = self.view.content_source(content)                             #get source 
+        self.controller.start_session(time, receiver, content, log)            #start clock
+        cache = self.cache_assignment[receiver]                                #who is the cacher of receiver?
+        self.controller.forward_request_path(receiver, cache)                  #forward request to cacher
+        if not self.controller.get_content(cache):                             #cacher has the req content?
+            self.controller.forward_request_path(cache, source)                #if not forword the req to source
+            self.controller.get_content(source)                                #get content from source
+            self.controller.forward_content_path(source, cache)                #send to cacher
+            self.controller.put_content(cache)                                 #cacher cached
+        self.controller.forward_content_path(cache, receiver)                  #send to receiver
+        self.controller.end_session()                                          #stop clock
 
 
 @register_strategy('EDGE')
 class Edge(Strategy):
     """Edge caching strategy.
 
-    In this strategy only a cache at the edge is looked up before forwarding
+    In this strategy only @@a cache at the edge@@ is looked up before forwarding
     a content request to the original source.
 
     In practice, this is like an LCE but it only queries the first cache it
@@ -88,19 +88,19 @@ class Edge(Strategy):
         source = self.view.content_source(content)
         path = self.view.shortest_path(receiver, source)
         # Route requests to original source and queries caches on the path
-        self.controller.start_session(time, receiver, content, log)
-        edge_cache = None
-        for u, v in path_links(path):
-            self.controller.forward_request_hop(u, v)
-            if self.view.has_cache(v):
-                edge_cache = v
-                if self.controller.get_content(v):
-                    serving_node = v
+        self.controller.start_session(time, receiver, content, log)            #start clock
+        edge_cache = None                                                      
+        for u, v in path_links(path):                                          #each u-v hops from receiver to source
+            self.controller.forward_request_hop(u, v)                          #forword request to next hop
+            if self.view.has_cache(v):                                         #next node cached something
+                edge_cache = v                                                 #get the 1st cache node 
+                if self.controller.get_content(v):                             #cache hit = true
+                    serving_node = v                                           #content get from whom?
                 else:
                     # Cache miss, get content from source
-                    self.controller.forward_request_path(v, source)
-                    self.controller.get_content(source)
-                    serving_node = source
+                    self.controller.forward_request_path(v, source)            #miss-send req to source
+                    self.controller.get_content(source)                        #get the content
+                    serving_node = source                                      #content get from whom?
                 break
         else:
             # No caches on the path at all, get it from source
@@ -108,10 +108,10 @@ class Edge(Strategy):
             serving_node = v
 
         # Return content
-        path = list(reversed(self.view.shortest_path(receiver, serving_node)))
+        path = list(reversed(self.view.shortest_path(receiver, serving_node))) #get the return path from served node
         self.controller.forward_content_path(serving_node, receiver, path)
         if serving_node == source:
-            self.controller.put_content(edge_cache)
+            self.controller.put_content(edge_cache)                            #save the content to 1st cache node
         self.controller.end_session()
 
 
@@ -134,7 +134,7 @@ class LeaveCopyEverywhere(Strategy):
         path = self.view.shortest_path(receiver, source)
         # Route requests to original source and queries caches on the path
         self.controller.start_session(time, receiver, content, log)
-        for u, v in path_links(path):
+        for u, v in path_links(path):                                          #search in all nodes on path
             self.controller.forward_request_hop(u, v)
             if self.view.has_cache(v):
                 if self.controller.get_content(v):
@@ -145,7 +145,7 @@ class LeaveCopyEverywhere(Strategy):
             serving_node = v
         # Return content
         path = list(reversed(self.view.shortest_path(receiver, serving_node)))
-        for u, v in path_links(path):
+        for u, v in path_links(path):                                          #cache in all nodes during return
             self.controller.forward_content_hop(u, v)
             if self.view.has_cache(v):
                 # insert content
@@ -157,7 +157,7 @@ class LeaveCopyEverywhere(Strategy):
 class LeaveCopyDown(Strategy):
     """Leave Copy Down (LCD) strategy.
 
-    According to this strategy, one copy of a content is replicated only in
+    According to this strategy, @@one copy@@ of a content is replicated only in
     the caching node you hop away from the serving node in the direction of
     the receiver. This strategy is described in [2]_.
 
@@ -194,7 +194,7 @@ class LeaveCopyDown(Strategy):
         # Leave a copy of the content only in the cache one level down the hit
         # caching node
         copied = False
-        for u, v in path_links(path):
+        for u, v in path_links(path): #take content to receiver & save only on one node to path
             self.controller.forward_content_hop(u, v)
             if not copied and v != receiver and self.view.has_cache(v):
                 self.controller.put_content(v)
@@ -253,13 +253,13 @@ class ProbCache(Strategy):
             serving_node = v
         # Return content
         path = list(reversed(self.view.shortest_path(receiver, serving_node)))
-        c = len([node for node in path if self.view.has_cache(node)])
-        x = 0.0
+        c = len([node for node in path if self.view.has_cache(node)])   #Time Since Inception(TSI=req)
+        x = 0                                                           #Time Since Birth(TSI=msg)
         for hop in range(1, len(path)):
             u = path[hop - 1]
             v = path[hop]
-            N = sum([self.cache_size[n] for n in path[hop - 1:]
-                     if n in self.cache_size])
+            N = sum([self.cache_size[n] for n in path[hop - 1:] #u_to_receiver
+                     if n in self.cache_size])                  
             if v in self.cache_size:
                 x += 1
             self.controller.forward_content_hop(u, v)
@@ -297,7 +297,7 @@ class CacheLessForMore(Strategy):
             self.betw = dict((v, nx.betweenness_centrality(nx.ego_graph(topology, v))[v])
                              for v in topology.nodes())
         else:
-            self.betw = nx.betweenness_centrality(topology)
+            self.betw = nx.betweenness_centrality(topology) #Closeness centrality is present in nx also
 
     @inheritdoc(Strategy)
     def process_event(self, time, receiver, content, log):
@@ -308,7 +308,7 @@ class CacheLessForMore(Strategy):
         self.controller.start_session(time, receiver, content, log)
         for u, v in path_links(path):
             self.controller.forward_request_hop(u, v)
-            if self.view.has_cache(v):
+            if self.view.has_cache(v): #checks if a 'cache node'
                 if self.controller.get_content(v):
                     serving_node = v
                     break
@@ -324,7 +324,7 @@ class CacheLessForMore(Strategy):
         max_betw = -1
         designated_cache = None
         for v in path[1:]:
-            if self.view.has_cache(v):
+            if self.view.has_cache(v): # checks if a cache node
                 if self.betw[v] >= max_betw:
                     max_betw = self.betw[v]
                     designated_cache = v
