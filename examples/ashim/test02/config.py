@@ -41,7 +41,7 @@ default['content_placement']['name'] = 'UNIFORM'
 
 default['cache_policy']['name'] = 'LRU'
 
-STRATEGIES = [ 'NO_CACHE','RAND_CHOICE', 'LCE', 'LCD', 'CL4M', 'PROB_CACHE' ]
+STRATEGIES = [ 'NO_CACHE','RAND_CHOICE', 'LCE', 'LCD', 'CL4M', 'ASHIM_CLOSENESS', 'ASHIM_HBLB', 'ASHIM_HBHC' ]
 
 
 for strategy in STRATEGIES:

@@ -414,3 +414,204 @@ class RandomChoice(Strategy):
             if v == designated_cache:
                 self.controller.put_content(v)
         self.controller.end_session()
+
+
+"""Newly Implemented"""
+
+@register_strategy('ASHIM_CLOSENESS')
+class AshimCloseness(Strategy):
+    """caching based on closeness centrlity
+    """
+
+    @inheritdoc(Strategy)
+    def __init__(self, view, controller, **kwargs):
+        super(AshimCloseness, self).__init__(view, controller)
+        topology = view.topology()
+        self.close = nx.closeness_centrality(topology) #Closeness centrality is present in nx also
+
+    @inheritdoc(Strategy)
+    def process_event(self, time, receiver, content, log):
+        # get all required data
+        source = self.view.content_source(content)
+        path = self.view.shortest_path(receiver, source)
+        # Route requests to original source and queries caches on the path
+        self.controller.start_session(time, receiver, content, log)
+        for u, v in path_links(path):
+            self.controller.forward_request_hop(u, v)
+            if self.view.has_cache(v): #checks if a 'cache node'
+                if self.controller.get_content(v):
+                    serving_node = v
+                    break
+        # No cache hits, get content from source
+        else:
+            self.controller.get_content(v)
+            serving_node = v
+        # Return content
+        path = list(reversed(self.view.shortest_path(receiver, serving_node)))
+        # get the cache with maximum betweenness centrality
+        # if there are more than one cache with max betw then pick the one
+        # closer to the receiver
+        max_close = -1
+        designated_cache = None
+        for v in path[1:]:
+            if self.view.has_cache(v): # checks if a cache node
+                if self.close[v] >= max_close:
+                    max_close = self.close[v]
+                    designated_cache = v
+        # Forward content
+        for u, v in path_links(path):
+            self.controller.forward_content_hop(u, v)
+            if v == designated_cache:
+                self.controller.put_content(v)
+        self.controller.end_session()
+        
+#High betweeness and Low betweeness
+
+@register_strategy('ASHIM_HBLB')
+class AshimHBLB(Strategy):
+    """caching based on closeness centrlity
+    """
+
+    @inheritdoc(Strategy)
+    def __init__(self, view, controller, **kwargs):
+        super(AshimHBLB, self).__init__(view, controller)
+        topology = view.topology()
+        self.betw = nx.betweenness_centrality(topology) #Closeness centrality is present in nx also
+
+    @inheritdoc(Strategy)
+    def process_event(self, time, receiver, content, log):
+        # get all required data
+        source = self.view.content_source(content)
+        path = self.view.shortest_path(receiver, source)
+        # Route requests to original source and queries caches on the path
+        self.controller.start_session(time, receiver, content, log)
+        for u, v in path_links(path):
+            self.controller.forward_request_hop(u, v)
+            if self.view.has_cache(v): #checks if a 'cache node'
+                if self.controller.get_content(v):
+                    serving_node = v
+                    break
+        # No cache hits, get content from source
+        else:
+            self.controller.get_content(v)
+            serving_node = v
+        # Return content
+        path = list(reversed(self.view.shortest_path(receiver, serving_node)))
+        # get the cache with maximum betweenness centrality
+        # if there are more than one cache with max betw then pick the one
+        # closer to the receiver
+        max_betw = -1
+        min_betw = 9999999
+        designated_cache = None
+        designated_cache2 = None
+        for v in path[1:]:
+            if self.view.has_cache(v): # checks if a cache node
+                if self.betw[v] >= max_betw:
+                    max_betw = self.betw[v]
+                    designated_cache = v
+                if self.betw[v] <= min_betw:
+                    min_betw = self.betw[v]
+                    designated_cache2 = v
+            
+        # Forward content
+        for u, v in path_links(path):
+            self.controller.forward_content_hop(u, v)
+            if v == designated_cache:
+                self.controller.put_content(v)
+            if v == designated_cache2:
+                self.controller.put_content(v)
+        self.controller.end_session()
+
+
+
+#High betweeness and high closeness
+
+@register_strategy('ASHIM_HBHC')
+class AshimHBHC(Strategy):
+    """caching based on closeness centrlity
+    """
+
+    @inheritdoc(Strategy)
+    def __init__(self, view, controller, **kwargs):
+        super(AshimHBHC, self).__init__(view, controller)
+        topology = view.topology()
+        self.betw = nx.betweenness_centrality(topology) #Closeness centrality is present in nx also
+        self.close = nx.closeness_centrality(topology)
+
+    @inheritdoc(Strategy)
+    def process_event(self, time, receiver, content, log):
+        # get all required data
+        source = self.view.content_source(content)
+        path = self.view.shortest_path(receiver, source)
+        # Route requests to original source and queries caches on the path
+        self.controller.start_session(time, receiver, content, log)
+        for u, v in path_links(path):
+            self.controller.forward_request_hop(u, v)
+            if self.view.has_cache(v): #checks if a 'cache node'
+                if self.controller.get_content(v):
+                    serving_node = v
+                    break
+        # No cache hits, get content from source
+        else:
+            self.controller.get_content(v)
+            serving_node = v
+        # Return content
+        path = list(reversed(self.view.shortest_path(receiver, serving_node)))
+        # get the cache with maximum betweenness centrality
+        # if there are more than one cache with max betw then pick the one
+        # closer to the receiver
+        max_betw = -1
+        max_close = -1
+        designated_cache = None
+        designated_cache2 = None
+        for v in path[1:]:
+            if self.view.has_cache(v): # checks if a cache node
+                if self.betw[v] >= max_betw:
+                    max_betw = self.betw[v]
+                    designated_cache = v
+                if self.close[v] >= max_close:
+                    max_close = self.close[v]
+                    designated_cache2 = v
+            
+        # Forward content
+        for u, v in path_links(path):
+            self.controller.forward_content_hop(u, v)
+            if v == designated_cache:
+                self.controller.put_content(v)
+            if v == designated_cache2:
+                self.controller.put_content(v)
+        self.controller.end_session()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

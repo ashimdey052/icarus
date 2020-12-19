@@ -51,7 +51,7 @@ DATA_COLLECTORS = ['CACHE_HIT_RATIO', 'LATENCY', 'LINK_LOAD', 'PATH_STRETCH']
 ALPHA = [0.6, 0.8, 1.0, 1.2]
 
 # Total size of network cache as a fraction of content population
-NETWORK_CACHE = [0.004, 0.002, 0.01, 0.05]
+NETWORK_CACHE = [0.004, 0.002, 0.01, 0.05] # 0.4%, 0.2%, 1%, 5%
 
 # Number of content objects
 N_CONTENTS = 3 * 10 ** 5
@@ -70,20 +70,23 @@ N_MEASURED_REQUESTS = 6 * 10 ** 5
 # List of all implemented topologies
 # Topology implementations are located in ./icarus/scenarios/topology.py
 TOPOLOGIES = [
-        #'GEANT',
-        'WIDE'#,
-       # 'GARR',
-        #'TISCALI',
+        'GEANT',
+        'WIDE',
+        'GARR',
+        'TISCALI',
               ]
 
 # List of caching and routing strategies
 # The code is located in ./icarus/models/strategy.py
 STRATEGIES = [
+    'ASHIM_CLOSENESS',
+    'ASHIM_HBLB',
+    'ASHIM_HBHC',
      'LCE',  # Leave Copy Everywhere
      'NO_CACHE',  # No caching, shorest-path routing
-     'HR_SYMM',  # Symmetric hash-routing
-     'HR_ASYMM',  # Asymmetric hash-routing
-     'HR_MULTICAST',  # Multicast hash-routing
+     #'HR_SYMM',  # Symmetric hash-routing
+     #'HR_ASYMM',  # Asymmetric hash-routing
+     #'HR_MULTICAST',  # Multicast hash-routing
      # 'HR_HYBRID_AM',  # Hybrid Asymm-Multicast hash-routing
      # 'HR_HYBRID_SM',  # Hybrid Symm-Multicast hash-routing
      'CL4M',  # Cache less for more

@@ -39,7 +39,7 @@ PLOT_EMPTY_GRAPHS = False
 BW_COLOR_CATALOGUE = ['k', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9']
 
 # Catalogue of possible hatch styles (for bar charts)
-HATCH_CATALOGUE = [None, '/', '\\', '\\\\', '//', '+', 'x', '*', 'o', '.', '|', '-', 'O']
+HATCH_CATALOGUE = [None , '/', '\\', '\\\\', '//', '+', 'x', '*', 'o', '.', '|', '-', 'O'] #make none to remove all hatch
 
 
 def plot_lines(resultset, desc, filename, plotdir):
@@ -437,6 +437,14 @@ def plot_bar_chart(resultset, desc, filename, plotdir):
     plt.xlim(xmin, left - separation + border)
     if 'ymax' in desc:
         plt.ylim(ymax=desc['ymax'])
+    #######
+    # xmin,xmax = plt.xlim()
+    # ymin,ymax = plt.ylim()
+    # if 'xleft' and 'xright' in desc:
+    #     plt.xlim(xmin-desc['xleft'], xmax+desc['xright'] )
+    # if 'ybottom' and 'ytop' in desc:
+    #     plt.ylim(ymin-desc['ybottom'], ymin+desc['ytop'])
+    #########
     plt.savefig(os.path.join(plotdir, filename), bbox_inches='tight')
     plt.close(fig)
 

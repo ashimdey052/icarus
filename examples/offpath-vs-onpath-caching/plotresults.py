@@ -42,14 +42,17 @@ PLOT_EMPTY_GRAPHS = True
 # On-path strategies: dashed lines
 # No-cache: dotted line
 STRATEGY_STYLE = {
-         'HR_SYMM':         'b-o',
-         'HR_ASYMM':        'g-D',
-         'HR_MULTICAST':    'm-^',
-         #'HR_HYBRID_AM':    'c-s',
+         #'HR_SYMM':         'b-o',
+         #'HR_ASYMM':        'g-D',
+         #'HR_MULTICAST':    'm-^',
+         'ASHIM_HBHC':    'b-o',
+         'ASHIM_HBLB':    'm-^',
+         #'HR_HYBRID_AM':    'c-s', 
+         'ASHIM_CLOSENESS' : 'c-s', ## added ashim
         #'HR_HYBRID_SM':    'r-v',
          'LCE':             'b--p',
          'LCD':             'g-->',
-         'CL4M':            'g-->',
+         'CL4M':            'g--<',
          'PROB_CACHE':      'c--<',
          'RAND_CHOICE':     'r--<',
          #'RAND_BERNOULLI':  'g--*',
@@ -59,11 +62,14 @@ STRATEGY_STYLE = {
 
 # This dict maps name of strategies to names to be displayed in the legend
 STRATEGY_LEGEND = {
+    'ASHIM_CLOSENESS' : 'Close Cent',
+    'ASHIM_HBLB' : 'HBLB',
+    'ASHIM_HBHC' : 'HBHC',#added ashim
          'LCE':             'LCE',
          'LCD':             'LCD',
-         'HR_SYMM':         'HR Symm',
-         'HR_ASYMM':        'HR Asymm',
-         'HR_MULTICAST':    'HR Multicast',
+         #'HR_SYMM':         'HR Symm',
+         #'HR_ASYMM':        'HR Asymm',
+         #'HR_MULTICAST':    'HR Multicast',
         #'HR_HYBRID_AM':    'HR Hybrid AM',
          #'HR_HYBRID_SM':    'HR Hybrid SM',
          'CL4M':            'CL4M',
@@ -79,16 +85,16 @@ STRATEGY_BAR_COLOR = {
     'LCE':          'k',
     'LCD':          '0.4',
     'NO_CACHE':     '0.5',
-    'HR_ASYMM':     '0.6',
-    'HR_SYMM':      '0.7'
+   # 'HR_ASYMM':     '0.6',
+    #'HR_SYMM':      '0.7'
     }
 
 STRATEGY_BAR_HATCH = {
     'LCE':          None,
     'LCD':          '//',
     'NO_CACHE':     'x',
-    'HR_ASYMM':     '+',
-    'HR_SYMM':      '\\'
+    #'HR_ASYMM':     '+',
+    #'HR_SYMM':      '\\'
     }
 
 
