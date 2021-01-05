@@ -204,7 +204,7 @@ def compute_clusters(topology, k, distance='delay', nbunch=None, n_iter=10):
     """Cluster nodes of a topologies as to minimize the intra-cluster latency.
 
     This function assumes that every link is labelled with latencies and
-    performs clustering using the k-medoids method with the PAM algorithm.
+    performs clustering using the k-medoids method with the PAM(Partitioning Around Medoids) algorithm.
 
     Parameters
     ----------

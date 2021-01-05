@@ -86,13 +86,14 @@ class NearestReplicaRouting(Strategy):
         if self.metacaching == 'LCE':
             for u, v in path_links(path):
                 self.controller.forward_content_hop(u, v)
-                if self.view.has_cache(v) and not self.view.cache_lookup(v, content):
+                if self.view.has_cache(v) and not self.view.cache_lookup(v, content):# ccache not and content is not present
                     self.controller.put_content(v)
         elif self.metacaching == 'LCD':
             copied = False
             for u, v in path_links(path):
                 self.controller.forward_content_hop(u, v)
-                if not copied and v != receiver and self.view.has_cache(v):
+                
+                if not copied and v != receiver and self.view.has_cache(v):#cache_lookup er dorkar nei, conten not present for sure
                     self.controller.put_content(v)
                     copied = True
         else:

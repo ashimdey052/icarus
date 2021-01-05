@@ -5,7 +5,7 @@ import networkx as nx
 
 from icarus.registry import register_strategy
 from icarus.util import inheritdoc, multicast_tree, path_links
-from icarus.scenarios.algorithms import extract_cluster_level_topology
+from icarus.scenarios.algorithms import extract_cluster_level_topology,compute_clusters,deploy_clusters
 
 from .base import Strategy
 
@@ -15,6 +15,7 @@ __all__ = [
        'HashroutingEdge',
        'HashroutingOnPath',
        'HashroutingClustered',
+       'AshimHashroutingClustered',
        'HashroutingSymmetric',
        'HashroutingAsymmetric',
        'HashroutingMulticast',
@@ -35,12 +36,14 @@ class BaseHashrouting(Strategy):
         self.cache_assignment = {i: self.cache_nodes[i]
                                  for i in range(len(self.cache_nodes))}
         # Check if there are clusters
+        
         if 'clusters' in self.view.topology().graph:
             self.clusters = self.view.topology().graph['clusters']
             # Convert to list in case it comes as set or iterable
+            print("ASHIM test33333333333333333333333388888888888888889999999999")
             for i, cluster in enumerate(self.clusters):
                 self.clusters[i] = list(cluster)
-            self.cluster_size = {i: len(self.clusters[i])
+            self.cluster_size = {i: len(self.clusters[i]) # How many clusters?
                                  for i in range(len(self.clusters))}
 
     def authoritative_cache(self, content, cluster=None):
@@ -195,7 +198,7 @@ class HashroutingEdge(BaseHashrouting):
            http://discovery.ucl.ac.uk/1473436/
     """
 
-    def __init__(self, view, controller, routing, edge_cache_ratio, **kwargs):
+    def __init__(self, view, controller, routing='MULTICAST', edge_cache_ratio=0.3, **kwargs):
         """Constructor
 
         Parameters
@@ -212,12 +215,13 @@ class HashroutingEdge(BaseHashrouting):
         if edge_cache_ratio < 0 or edge_cache_ratio > 1:# fraction memory given to the local cache
             raise ValueError('edge_cache_ratio must be between 0 and 1')
         super(HashroutingEdge, self).__init__(view, controller)
-        self.routing = 'MULTICAST'###################################################routing
-        self.controller.reserve_local_cache(edge_cache_ratio)
+        self.routing = routing#'MULTICAST'###################################################routing
+        self.controller.reserve_local_cache(edge_cache_ratio)# by default 0.1
+        
         self.proxy = {v: list(self.view.topology().adj[v].keys())[0]
                         for v in self.view.topology().receivers()}
         if any(v not in self.view.topology().cache_nodes() for v in self.proxy.values()):
-            raise ValueError('There are receivers connected to a proxy without cache')
+            raise ValueError('There are receivers connected to a proxy without cache')#example= TISCALI
 
     @inheritdoc(Strategy)
     def process_event(self, time, receiver, content, log):#reqeust sent to proxy if miss ->cache if miss->source
@@ -307,8 +311,7 @@ class HashroutingOnPath(BaseHashrouting):
            University College London, Dec. 2015. Available:
            http://discovery.ucl.ac.uk/1473436/
     """
-
-    def __init__(self, view, controller, routing, on_path_cache_ratio, **kwargs):
+    def __init__(self, view, controller, routing='MULTICAST', on_path_cache_ratio=0.3, **kwargs):
         """Constructor
 
         Parameters
@@ -325,7 +328,7 @@ class HashroutingOnPath(BaseHashrouting):
         if on_path_cache_ratio < 0 or on_path_cache_ratio > 1:
             raise ValueError('on_path_cache_ratio must be between 0 and 1')
         super(HashroutingOnPath, self).__init__(view, controller)
-        self.routing = 'MULTICAST'##################################################routing
+        self.routing = routing#'MULTICAST'##################################################routing
         self.controller.reserve_local_cache(on_path_cache_ratio)
 
     @inheritdoc(Strategy)
@@ -451,7 +454,7 @@ class HashroutingClustered(BaseHashrouting):
                              % intra_routing)
         self.intra_routing = intra_routing
         self.inter_routing = inter_routing
-        self.cluster_topology = extract_cluster_level_topology(view.topology())#######
+        self.cluster_topology = extract_cluster_level_topology(view.topology())#There are 4 options: icarus/icarus/scenarios/algorithms.py
         self.cluster_sp = dict(nx.all_pairs_shortest_path(self.cluster_topology))######
 
     @inheritdoc(Strategy)
@@ -800,3 +803,189 @@ class HashroutingHybridSM(BaseHashrouting):
                     self.controller.forward_content_path(source, receiver, main_path=True)
                     self.controller.forward_content_path(fork_node, cache, main_path=False)
                 self.controller.end_session()
+                
+                
+                
+@register_strategy('ASHIM_HR_CLUSTER')
+class AshimHashroutingClustered(BaseHashrouting):
+    """Hash-routing with clustering of the network.
+
+    According to ths strategy, nodes of the network are divided in a number of
+    clusters and hash-routing is used withing each of this clusters. In case of
+    cache miss at a cluster, requests are forwarded to other clusters on the
+    path to the original source.
+
+    References
+    ----------
+    .. [2] L. Saino, On the Design of Efficient Caching Systems, Ph.D. thesis
+           University College London, Dec. 2015. Available:
+           http://discovery.ucl.ac.uk/1473436/
+    """
+
+    def __init__(self, view, controller, intra_routing='MULTICAST', inter_routing='LCE', **kwargs):
+        """Constructor
+
+        Parameters
+        ----------
+        view : NetworkView
+            An instance of the network view
+        controller : NetworkController
+            An instance of the network controller
+        intra_routing : str
+            Intra-cluster content routing scheme: SYMM, ASYMM or MULTICAST
+        inter_routing : str
+            Inter-cluster content routing scheme. Only supported LCE
+        """
+        
+        
+        
+        super(AshimHashroutingClustered, self).__init__(view, controller)
+        if intra_routing not in ('SYMM', 'ASYMM', 'MULTICAST'):
+            raise ValueError('Intra-cluster routing policy %s not supported'
+                             % intra_routing)
+        self.intra_routing = intra_routing
+        self.inter_routing = inter_routing
+        #self.cluster_topology = extract_cluster_level_topology(view.topology())#There are 4 options: icarus/icarus/scenarios/algorithms.py
+        
+        # self.view.topology().graph['clusters'] = compute_clusters(view.topology(),3)
+        # #self.view.topology().graph['clusters'] = self.clusters
+        # self.view.topology().graph['icr_candidates'] = set(view.topology().nodes())
+        # deploy_clusters(view.topology(),self.view.topology().graph['clusters'])
+        # self.cluster_topology = extract_cluster_level_topology(view.topology())
+        
+        
+        
+        #self.view.topology().graph['clusters'] = 
+        #self.view.topology().graph['clusters'] = self.clusters
+        view.topology().graph['icr_candidates'] = set(view.topology().nodes())
+        deploy_clusters(view.topology(),compute_clusters(view.topology(),3))
+        self.cluster_topology = extract_cluster_level_topology(view.topology())
+        self.cluster_sp = dict(nx.all_pairs_shortest_path(self.cluster_topology))#shortest path among clusters
+        
+        
+        print(view.topology().graph['clusters'])
+        print(view.topology().graph['icr_candidates'])
+        print(self.cluster_sp)
+        print(view.topology())
+        print(self.cluster_topology)
+        
+        
+        
+        if 'clusters' in self.view.topology().graph:
+            self.clusters = self.view.topology().graph['clusters']
+            # Convert to list in case it comes as set or iterable
+            #print("ASHIM test22222222222222222222222222222222222222222222222222222222222222")
+            for i, cluster in enumerate(self.clusters):
+                self.clusters[i] = list(cluster)
+            self.cluster_size = {i: len(self.clusters[i]) # How many clusters?
+                                 for i in range(len(self.clusters))}
+        
+    @inheritdoc(Strategy)
+    def process_event(self, time, receiver, content, log):
+        # get all required data
+        source = self.view.content_source(content)
+        # handle (and log if required) actual request
+        self.controller.start_session(time, receiver, content, log)
+
+        receiver_cluster = self.view.cluster(receiver) # receiver belongs to which cluster?
+        source_cluster = self.view.cluster(source)     # source belongs to which cluster?
+        cluster_path = self.cluster_sp[receiver_cluster][source_cluster]    # intermedient clusters from R to S
+
+        if self.inter_routing == 'LCE':
+            start = receiver
+            for cluster in cluster_path:## Checks content is cached in which cluster?
+                cache = self.authoritative_cache(content, cluster)#####
+                # Forward request to authoritative cache
+                self.controller.forward_request_path(start, cache)
+                start = cache
+                if self.controller.get_content(cache):
+                    break
+            else:
+                # Loop was never broken, cache miss
+                self.controller.forward_request_path(start, source)
+                start = source
+                if not self.controller.get_content(source):
+                    raise RuntimeError('The content is not found the expected source')
+        elif self.inter_routing == 'EDGE': # check only edge cluster have the content if not request directly forwarded to the source
+            cache = self.authoritative_cache(content, receiver_cluster)
+            self.controller.forward_request_path(receiver, cache)
+            if self.controller.get_content(cache):
+                self.controller.forward_content_path(cache, receiver)
+                self.controller.end_session()
+                return
+            else:
+                self.controller.forward_request_path(cache, source)
+                self.controller.get_content(source)
+                cluster = source_cluster
+                start = source
+
+        # Now "start" is the node that is serving the content
+        cluster_path = list(reversed(self.cluster_sp[receiver_cluster][cluster]))
+        if self.inter_routing == 'LCE':
+            if self.intra_routing == 'SYMM':
+                for cluster in cluster_path:
+                    cache = self.authoritative_cache(content, cluster)
+                    # Forward request to authoritative cache
+                    self.controller.forward_content_path(start, cache)
+                    self.controller.put_content(cache)
+                    start = cache
+                self.controller.forward_content_path(start, receiver)
+            elif self.intra_routing == 'ASYMM':
+                self.controller.forward_content_path(start, receiver)
+                path = self.view.shortest_path(start, receiver)
+                traversed_clusters = set(self.view.cluster(v) for v in path) # Which cluters are on the shortest path?
+                authoritative_caches = set(self.authoritative_cache(content, cluster)# Which nodes are authorative to cache the contents on those clusters
+                                        for cluster in traversed_clusters)
+                traversed_caches = authoritative_caches.intersection(set(path))#Among those nodes which nodes relies on the path of return path
+                for v in traversed_caches:
+                    self.controller.put_content(v)
+            elif self.intra_routing == 'MULTICAST': 
+                destinations = [self.authoritative_cache(content, cluster) # which nodes will cache the content
+                                for cluster in cluster_path]
+                for v in destinations:
+                    self.controller.put_content(v)
+                main_path = set(path_links(self.view.shortest_path(start, receiver)))
+                mcast_tree = multicast_tree(self.view.all_pairs_shortest_paths(), start, destinations)
+                mcast_tree = mcast_tree.difference(main_path)
+                for u, v in mcast_tree:
+                    self.controller.forward_content_hop(u, v, main_path=False)
+                for u, v in main_path:
+                    self.controller.forward_content_hop(u, v, main_path=True)
+            else:
+                raise ValueError("Intra-cluster routing %s not supported" % self.intra_routing)
+        elif self.inter_routing == 'EDGE':
+            if self.intra_routing == 'SYMM':
+                cache = self.authoritative_cache(content, cluster_path[-1])
+                self.controller.forward_content_path(start, cache)
+                self.controller.forward_content_path(cache, receiver)
+                path = self.view.shortest_path(start, receiver)
+                traversed_clusters = set(self.view.cluster(v) for v in path)
+                authoritative_caches = set(self.authoritative_cache(content, cluster)
+                                        for cluster in traversed_clusters)
+                traversed_caches = authoritative_caches.intersection(set(path))
+                for v in traversed_caches:
+                    self.controller.put_content(v)
+                if cache not in traversed_caches:
+                    self.controller.put_content(cache)
+            elif self.intra_routing == 'ASYMM':
+                self.controller.forward_content_path(start, receiver)
+                path = self.view.shortest_path(start, receiver)
+                traversed_clusters = set(self.view.cluster(v) for v in path)
+                authoritative_caches = set(self.authoritative_cache(content, cluster)
+                                        for cluster in traversed_clusters)
+                traversed_caches = authoritative_caches.intersection(set(path))
+                for v in traversed_caches:
+                    self.controller.put_content(v)
+            elif self.intra_routing == 'MULTICAST':
+                cache = self.authoritative_cache(content, cluster_path[-1])
+                self.controller.put_content(cache)
+                main_path = set(path_links(self.view.shortest_path(start, receiver)))
+                mcast_tree = multicast_tree(self.view.all_pairs_shortest_paths(), start, [cache])
+                mcast_tree = mcast_tree.difference(main_path)
+                for u, v in mcast_tree:
+                    self.controller.forward_content_hop(u, v, main_path=False)
+                for u, v in main_path:
+                    self.controller.forward_content_hop(u, v, main_path=True)
+        else:
+            raise ValueError("Inter-cluster routing %s not supported" % self.inter_routing)
+        self.controller.end_session()

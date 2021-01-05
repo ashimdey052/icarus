@@ -13,7 +13,7 @@ LOG_LEVEL = 'INFO'
 
 # If True, executes simulations in parallel using multiple processes
 # to take advantage of multicore CPUs
-PARALLEL_EXECUTION = True
+PARALLEL_EXECUTION = False
 
 # Number of processes used to run simulations in parallel.
 # This option is ignored if PARALLEL_EXECUTION = False
@@ -34,7 +34,7 @@ N_REPLICATIONS = 1 #2
 
 # List of metrics to be measured in the experiments
 # The implementation of data collectors are located in ./icarus/execution/collectors.py
-DATA_COLLECTORS = ['CACHE_HIT_RATIO', 'LATENCY', 'LINK_LOAD', 'PATH_STRETCH']
+DATA_COLLECTORS = ['CACHE_HIT_RATIO', 'LATENCY', 'LINK_LOAD']#, 'PATH_STRETCH']
 
 # Range of alpha values of the Zipf distribution using to generate content requests
 # alpha values must be positive. The greater the value the more skewed is the
@@ -72,25 +72,33 @@ N_MEASURED_REQUESTS = 4 * 10 ** 4
 # List of all implemented topologies
 # Topology implementations are located in ./icarus/scenarios/topology.py
 TOPOLOGIES = [
-        'GEANT',
-        'WIDE',
-        'GARR',
-        'TISCALI',
+        #'GEANT',
+        #'WIDE',
+        #'GARR',
+        #'TISCALI',#prob for hash_edge
               ]
 
 # List of caching and routing strategies
 # The code is located in ./icarus/models/strategy.py
 STRATEGIES = [
     
-      # 'HR_SYMM',  # Symmetric hash-routing
-      # 'HR_ASYMM',  # Asymmetric hash-routing
-     # 'HR_MULTICAST',  # Multicast hash-routing
-     # 'HR_HYBRID_AM',  # Hybrid Asymm-Multicast hash-routing
-     # 'HR_HYBRID_SM',  # Hybrid Symm-Multicast hash-routing
+     # 'LCE',  # Leave Copy Everywhere
+     # #'NO_CACHE',  # No caching, shorest-path routing
+     # 'CL4M',  # Cache less for more
+     # 'PROB_CACHE',  # ProbCache
+     # 'LCD',  # Leave Copy Down
+     # 'RAND_CHOICE',  # Random choice: cache in one random cache on path
+
      
-      'HR_EDGE_CACHE',
-      'HR_ON_PATH',
-      'HR_CLUSTER',
+     #  # 'HR_SYMM',  # Symmetric hash-routing
+     #  # 'HR_ASYMM',  # Asymmetric hash-routing
+     #  'HR_MULTICAST',  # Multicast hash-routing
+     # # 'HR_HYBRID_AM',  # Hybrid Asymm-Multicast hash-routing
+     #  'HR_HYBRID_SM',  # Hybrid Symm-Multicast hash-routing
+     
+       #'HR_EDGE_CACHE',
+      # 'HR_ON_PATH',
+       'HR_CLUSTER',
      
              ]
 
@@ -108,7 +116,7 @@ default['workload'] = {'name':       'STATIONARY', #Zipfs Distribution
                        'n_measured': N_MEASURED_REQUESTS,
                        'rate':       NETWORK_REQUEST_RATE
                        }
-default['cache_placement']['name'] = 'UNIFORM'
+default['cache_placement']['name'] = 'CLUSTERED_HASHROUTING'  #'UNIFORM'
 default['content_placement']['name'] = 'UNIFORM'
 default['cache_policy']['name'] = CACHE_POLICY
 
@@ -151,7 +159,13 @@ for alpha in ALPHA:
                 experiment = copy.deepcopy(default)
                 experiment['workload']['alpha'] = alpha
                 experiment['strategy']['name'] = strategy
-                experiment['topology']['name'] = topology# JAPAN
+                #experiment['topology']['name'] = topology# JAPAN
+                
+                experiment['topology']['name'] = 'PATH'
+                experiment['topology']['n'] = 10
+                experiment['topology']['delay'] = 10
+                
+                
                 experiment['cache_placement']['network_cache'] = network_cache
                 experiment['desc'] = "Alpha: %s, strategy: %s, topology: %s, network cache: %s" \
                                       % (str(alpha), strategy, topology, str(network_cache))

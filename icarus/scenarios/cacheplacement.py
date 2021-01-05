@@ -291,8 +291,8 @@ def optimal_hashrouting_cache_placement(topology, cache_budget, n_cache_nodes,
 
 
 @register_cache_placement('CLUSTERED_HASHROUTING')
-def clustered_hashrouting_cache_placement(topology, cache_budget, n_clusters,
-                            policy, distance='delay', **kwargs):
+def clustered_hashrouting_cache_placement(topology, cache_budget, n_clusters=3,
+                            policy='node_const', distance='delay', **kwargs):
     """Deploy caching nodes for hashrouting in with clusters
 
     Parameters
