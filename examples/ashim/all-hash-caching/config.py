@@ -72,8 +72,8 @@ N_MEASURED_REQUESTS = 4 * 10 ** 4
 # List of all implemented topologies
 # Topology implementations are located in ./icarus/scenarios/topology.py
 TOPOLOGIES = [
-        #'GEANT',
-        #'WIDE',
+        'GEANT',
+        'WIDE',
         'GARR',
         #'TISCALI',#prob for hash_edge
               ]
@@ -82,7 +82,7 @@ TOPOLOGIES = [
 # The code is located in ./icarus/models/strategy.py
 STRATEGIES = [
     
-     # 'LCE',  # Leave Copy Everywhere
+      'LCE',  # Leave Copy Everywhere
      # #'NO_CACHE',  # No caching, shorest-path routing
      # 'CL4M',  # Cache less for more
      # 'PROB_CACHE',  # ProbCache
@@ -92,7 +92,7 @@ STRATEGIES = [
      
      #  # 'HR_SYMM',  # Symmetric hash-routing
      #  # 'HR_ASYMM',  # Asymmetric hash-routing
-     #  'HR_MULTICAST',  # Multicast hash-routing
+       'HR_MULTICAST',  # Multicast hash-routing
      # # 'HR_HYBRID_AM',  # Hybrid Asymm-Multicast hash-routing
      #  'HR_HYBRID_SM',  # Hybrid Symm-Multicast hash-routing
      
@@ -165,9 +165,9 @@ for alpha in ALPHA:
                     experiment['cache_placement']['name'] = 'CLUSTERED_HASHROUTING'
                         
                         
-                experiment['topology']['name'] = 'PATH'
-                experiment['topology']['n'] = 10
-                experiment['topology']['delay'] = 10
+                # experiment['topology']['name'] = 'PATH'
+                # experiment['topology']['n'] = 10
+                # experiment['topology']['delay'] = 10
                 
                 
                 experiment['cache_placement']['network_cache'] = network_cache
