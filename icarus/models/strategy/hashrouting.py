@@ -40,7 +40,7 @@ class BaseHashrouting(Strategy):
         if 'clusters' in self.view.topology().graph:
             self.clusters = self.view.topology().graph['clusters']
             # Convert to list in case it comes as set or iterable
-            print("ASHIM test33333333333333333333333388888888888888889999999999")
+            #print("ASHIM test33333333333333333333333388888888888888889999999999")
             for i, cluster in enumerate(self.clusters):
                 self.clusters[i] = list(cluster)
             self.cluster_size = {i: len(self.clusters[i]) # How many clusters?
@@ -457,6 +457,14 @@ class HashroutingClustered(BaseHashrouting):
         self.cluster_topology = extract_cluster_level_topology(view.topology())#There are 4 options: icarus/icarus/scenarios/algorithms.py
         self.cluster_sp = dict(nx.all_pairs_shortest_path(self.cluster_topology))######
 
+
+        print(view.topology().graph['clusters'])
+        print(view.topology().graph['icr_candidates'])
+        print(self.cluster_sp)
+        print(view.topology())
+        print(self.cluster_topology)
+
+        
     @inheritdoc(Strategy)
     def process_event(self, time, receiver, content, log):
         # get all required data

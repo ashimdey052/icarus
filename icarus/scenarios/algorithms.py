@@ -227,7 +227,7 @@ def compute_clusters(topology, k, distance='delay', nbunch=None, n_iter=10):
     if nx.number_connected_components(topology) > 1:
         raise ValueError('The topology has more than one connected component')
     if nbunch is not None:
-        topology = topology.subgraph(nbunch)
+        topology = topology.subgraph(nbunch) # graph with only icrCandidates
     topology = nx.convert_node_labels_to_integers(topology, label_attribute='label')
 
     if distance is not None:

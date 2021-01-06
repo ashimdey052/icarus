@@ -74,7 +74,7 @@ N_MEASURED_REQUESTS = 4 * 10 ** 4
 TOPOLOGIES = [
         #'GEANT',
         #'WIDE',
-        #'GARR',
+        'GARR',
         #'TISCALI',#prob for hash_edge
               ]
 
@@ -116,7 +116,7 @@ default['workload'] = {'name':       'STATIONARY', #Zipfs Distribution
                        'n_measured': N_MEASURED_REQUESTS,
                        'rate':       NETWORK_REQUEST_RATE
                        }
-default['cache_placement']['name'] = 'CLUSTERED_HASHROUTING'  #'UNIFORM'
+default['cache_placement']['name'] = 'UNIFORM' #'CLUSTERED_HASHROUTING'
 default['content_placement']['name'] = 'UNIFORM'
 default['cache_policy']['name'] = CACHE_POLICY
 
@@ -161,6 +161,10 @@ for alpha in ALPHA:
                 experiment['strategy']['name'] = strategy
                 #experiment['topology']['name'] = topology# JAPAN
                 
+                if experiment['strategy']['name'] == "HR_CLUSTER":
+                    experiment['cache_placement']['name'] = 'CLUSTERED_HASHROUTING'
+                        
+                        
                 experiment['topology']['name'] = 'PATH'
                 experiment['topology']['n'] = 10
                 experiment['topology']['delay'] = 10
