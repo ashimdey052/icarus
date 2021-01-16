@@ -506,7 +506,7 @@ class HashroutingClustered(BaseHashrouting):
 
         # Now "start" is the node that is serving the content
         cluster_path = list(reversed(self.cluster_sp[receiver_cluster][cluster]))
-        if self.inter_routing == 'LCE':
+        if self.inter_routing == 'LCE':#put copy on every cluster's authorative cache
             if self.intra_routing == 'SYMM':
                 for cluster in cluster_path:
                     cache = self.authoritative_cache(content, cluster)
@@ -538,7 +538,7 @@ class HashroutingClustered(BaseHashrouting):
                     self.controller.forward_content_hop(u, v, main_path=True)
             else:
                 raise ValueError("Intra-cluster routing %s not supported" % self.intra_routing)
-        elif self.inter_routing == 'EDGE':
+        elif self.inter_routing == 'EDGE': # put copy only to the edge cluster's authorative cache
             if self.intra_routing == 'SYMM':
                 cache = self.authoritative_cache(content, cluster_path[-1])
                 self.controller.forward_content_path(start, cache)
@@ -687,7 +687,7 @@ class HashroutingHybridAM(BaseHashrouting):
             asymmetric delivery is used, otherwise multicast delivery is used.
         """
         super(HashroutingHybridAM, self).__init__(view, controller)
-        self.max_stretch = nx.diameter(view.topology()) * max_stretch
+        self.max_stretch = nx.diameter(view.topology()) * max_stretch # convert ratio into interms of hops
 
     @inheritdoc(Strategy)
     def process_event(self, time, receiver, content, log):
@@ -810,7 +810,7 @@ class HashroutingHybridSM(BaseHashrouting):
                     # Multicast delivery
                     self.controller.forward_content_path(source, receiver, main_path=True)
                     self.controller.forward_content_path(fork_node, cache, main_path=False)
-                self.controller.end_session()
+        self.controller.end_session()
                 
                 
                 
@@ -996,4 +996,321 @@ class AshimHashroutingClustered(BaseHashrouting):
                     self.controller.forward_content_hop(u, v, main_path=True)
         else:
             raise ValueError("Inter-cluster routing %s not supported" % self.inter_routing)
+        self.controller.end_session()
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+@register_strategy('ASHIM_HR_HYBRID_AM')
+class AshimHashroutingHybridAM(BaseHashrouting):
+   
+    
+
+    def __init__(self, view, controller, max_stretch=0.2, **kwargs):
+        """Constructor
+
+        Parameters
+        ----------
+        view : NetworkView
+            An instance of the network view
+        controller : NetworkController
+            An instance of the network controller
+        max_stretch : float, optional
+            The threshold path stretch (normalized by network diameter) set
+            to decide whether using asymmetric or multicast routing. If the
+            path stretch required to deliver a content is above max_stretch
+            asymmetric delivery is used, otherwise multicast delivery is used.
+        """
+        super(AshimHashroutingHybridAM, self).__init__(view, controller)
+        self.max_stretch = nx.diameter(view.topology()) * max_stretch # convert ratio into interms of hops
+
+    @inheritdoc(Strategy)
+    def process_event(self, time, receiver, content, log):
+        # get all required data
+        source = self.view.content_source(content)
+        cache = self.authoritative_cache(content)
+        # handle (and log if required) actual request
+        self.controller.start_session(time, receiver, content, log)
+        # Forward request to authoritative cache
+        
+        source_path_len = len(self.view.shortest_path(receiver, source))-1
+        cache_path_len =  len(self.view.shortest_path(receiver, cache))-1  
+        
+        if(cache_path_len<=source_path_len):
+            self.controller.forward_request_path(receiver, cache)
+        
+            #self.controller.forward_request_path(receiver, cache)
+            if self.controller.get_content(cache):
+                # We have a cache hit here
+                self.controller.forward_content_path(cache, receiver)
+            else:
+                # Cache miss: go all the way to source
+                self.controller.forward_request_path(cache, source)
+                if not self.controller.get_content(source):
+                    raise RuntimeError('The content was not found at the expected source')
+    
+                if cache in self.view.shortest_path(source, receiver):
+                    # Forward to cache
+                    self.controller.forward_content_path(source, cache)
+                    # Insert in cache
+                    self.controller.put_content(cache)
+                    # Forward to receiver
+                    self.controller.forward_content_path(cache, receiver)
+                else:
+                    # Multicast
+                    cache_path = self.view.shortest_path(source, cache)
+                    recv_path = self.view.shortest_path(source, receiver)
+    
+                    # find what is the node that has to fork the content flow
+                    for i in range(1, min([len(cache_path), len(recv_path)])):
+                        if cache_path[i] != recv_path[i]:
+                            fork_node = cache_path[i - 1]
+                            break
+                    else:
+                        fork_node = cache
+                    self.controller.forward_content_path(source, receiver, main_path=True)
+                    # multicast to cache only if stretch is under threshold
+                    if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch:#checks the threshold
+                        self.controller.forward_content_path(fork_node, cache, main_path=False)
+                        self.controller.put_content(cache)
+        else:
+            # Cache miss: go all the way to source
+            self.controller.forward_request_path(receiver, source)
+            if not self.controller.get_content(source):
+                raise RuntimeError('The content was not found at the expected source')
+
+            if cache in self.view.shortest_path(source, receiver):
+                # Forward to cache
+                self.controller.forward_content_path(source, cache)
+                # Insert in cache
+                self.controller.put_content(cache)
+                # Forward to receiver
+                self.controller.forward_content_path(cache, receiver)
+            else:
+                # Multicast
+                cache_path = self.view.shortest_path(source, cache)
+                recv_path = self.view.shortest_path(source, receiver)
+
+                # find what is the node that has to fork the content flow
+                for i in range(1, min([len(cache_path), len(recv_path)])):
+                    if cache_path[i] != recv_path[i]:
+                        fork_node = cache_path[i - 1]
+                        break
+                else:
+                    fork_node = cache
+                self.controller.forward_content_path(source, receiver, main_path=True)
+                # multicast to cache only if stretch is under threshold
+                if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch:#checks the threshold
+                    self.controller.forward_content_path(fork_node, cache, main_path=False)
+                    self.controller.put_content(cache)
+        self.controller.end_session()
+
+
+
+
+
+@register_strategy('ASHIM_HR_HYBRID_SM')
+class AshimHashroutingHybridSM(BaseHashrouting):
+   
+
+    @inheritdoc(Strategy)
+    def __init__(self, view, controller, max_stretch=0.2, **kwargs):
+        super(AshimHashroutingHybridSM, self).__init__(view, controller)
+        self.max_stretch = nx.diameter(view.topology()) * max_stretch
+        
+        
+    @inheritdoc(Strategy)
+    def process_event(self, time, receiver, content, log):
+        # get all required data
+        source = self.view.content_source(content)
+        cache = self.authoritative_cache(content)
+        # handle (and log if required) actual request
+        self.controller.start_session(time, receiver, content, log)
+        # Forward request to authoritative cache
+        self.controller.forward_request_path(receiver, cache)
+        if self.controller.get_content(cache):
+            # We have a cache hit here
+            self.controller.forward_content_path(cache, receiver)
+        else:
+            # Cache miss: go all the way to source
+            self.controller.forward_request_path(cache, source)
+            if not self.controller.get_content(source):
+                raise RuntimeError('The content is not found the expected source')
+
+            if cache in self.view.shortest_path(source, receiver):
+                self.controller.forward_content_path(source, cache)
+                # Insert in cache
+                self.controller.put_content(cache)
+                # Forward to receiver
+                self.controller.forward_content_path(cache, receiver)
+            else:
+                # Multicast
+                cache_path = self.view.shortest_path(source, cache)
+                recv_path = self.view.shortest_path(source, receiver)
+
+                # find what is the node that has to fork the content flow
+                for i in range(1, min([len(cache_path), len(recv_path)])):
+                    if cache_path[i] != recv_path[i]:
+                        fork_node = cache_path[i - 1]
+                        break
+                else:
+                    fork_node = cache
+
+                symmetric_path_len = len(self.view.shortest_path(source, cache)) + \
+                                     len(self.view.shortest_path(cache, receiver)) - 2
+                multicast_path_len = len(self.view.shortest_path(source, fork_node)) + \
+                                     len(self.view.shortest_path(fork_node, cache)) + \
+                                     len(self.view.shortest_path(fork_node, receiver)) - 3
+
+                self.controller.put_content(cache)
+                # If symmetric and multicast have equal cost, choose symmetric
+                # because of easier packet processing
+                if symmetric_path_len <= multicast_path_len:  # use symmetric delivery
+                    # Symmetric delivery
+                    self.controller.forward_content_path(source, cache, main_path=True)
+                    self.controller.forward_content_path(cache, receiver, main_path=True)
+                else:
+                    # Multicast delivery
+                    self.controller.forward_content_path(source, receiver, main_path=True)
+                    # self.controller.forward_content_path(fork_node, cache, main_path=False)
+                    
+                    # multicast to cache only if stretch is under threshold
+                    if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch:#checks the threshold
+                        self.controller.forward_content_path(fork_node, cache, main_path=False)
+                        self.controller.put_content(cache)
+                    
+                    
+        self.controller.end_session()
+                
+                
+@register_strategy('SERVER_ASHIM_HR_HYBRID_SM')
+class ServerAshimHashroutingHybridSM(BaseHashrouting):
+   
+
+    @inheritdoc(Strategy)
+    def __init__(self, view, controller, max_stretch=0.2, **kwargs):
+        super(ServerAshimHashroutingHybridSM, self).__init__(view, controller)
+        self.max_stretch = nx.diameter(view.topology()) * max_stretch
+        
+        
+    @inheritdoc(Strategy)
+    def process_event(self, time, receiver, content, log):
+        # get all required data
+        source = self.view.content_source(content)
+        cache = self.authoritative_cache(content)
+        # handle (and log if required) actual request
+        self.controller.start_session(time, receiver, content, log)
+        # Forward request to authoritative cache
+        
+        
+        source_path_len = len(self.view.shortest_path(receiver, source))-1
+        cache_path_len =  len(self.view.shortest_path(receiver, cache))-1  
+        
+        if(cache_path_len<=source_path_len):
+  
+            self.controller.forward_request_path(receiver, cache)
+            if self.controller.get_content(cache):
+                # We have a cache hit here
+                self.controller.forward_content_path(cache, receiver)
+            else:
+                # Cache miss: go all the way to source
+                self.controller.forward_request_path(cache, source)
+                if not self.controller.get_content(source):
+                    raise RuntimeError('The content is not found the expected source')
+    
+                if cache in self.view.shortest_path(source, receiver):
+                    self.controller.forward_content_path(source, cache)
+                    # Insert in cache
+                    self.controller.put_content(cache)
+                    # Forward to receiver
+                    self.controller.forward_content_path(cache, receiver)
+                else:
+                    # Multicast
+                    cache_path = self.view.shortest_path(source, cache)
+                    recv_path = self.view.shortest_path(source, receiver)
+    
+                    # find what is the node that has to fork the content flow
+                    for i in range(1, min([len(cache_path), len(recv_path)])):
+                        if cache_path[i] != recv_path[i]:
+                            fork_node = cache_path[i - 1]
+                            break
+                    else:
+                        fork_node = cache
+    
+                    symmetric_path_len = len(self.view.shortest_path(source, cache)) + \
+                                         len(self.view.shortest_path(cache, receiver)) - 2
+                    multicast_path_len = len(self.view.shortest_path(source, fork_node)) + \
+                                         len(self.view.shortest_path(fork_node, cache)) + \
+                                         len(self.view.shortest_path(fork_node, receiver)) - 3
+    
+                    self.controller.put_content(cache)
+                    # If symmetric and multicast have equal cost, choose symmetric
+                    # because of easier packet processing
+                    if symmetric_path_len <= multicast_path_len:  # use symmetric delivery
+                        # Symmetric delivery
+                        self.controller.forward_content_path(source, cache, main_path=True)
+                        self.controller.forward_content_path(cache, receiver, main_path=True)
+                    else:
+                        # Multicast delivery
+                        self.controller.forward_content_path(source, receiver, main_path=True)
+                        # self.controller.forward_content_path(fork_node, cache, main_path=False)
+                        
+                        # multicast to cache only if stretch is under threshold
+                        if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch:#checks the threshold
+                            self.controller.forward_content_path(fork_node, cache, main_path=False)
+                            self.controller.put_content(cache)
+        else:
+            self.controller.forward_request_path(receiver, source)
+            if not self.controller.get_content(source):
+                raise RuntimeError('The content is not found the expected source')
+
+            if cache in self.view.shortest_path(source, receiver):
+                self.controller.forward_content_path(source, cache)
+                # Insert in cache
+                self.controller.put_content(cache)
+                # Forward to receiver
+                self.controller.forward_content_path(cache, receiver)
+            else:
+                # Multicast
+                cache_path = self.view.shortest_path(source, cache)
+                recv_path = self.view.shortest_path(source, receiver)
+
+                # find what is the node that has to fork the content flow
+                for i in range(1, min([len(cache_path), len(recv_path)])):
+                    if cache_path[i] != recv_path[i]:
+                        fork_node = cache_path[i - 1]
+                        break
+                else:
+                    fork_node = cache
+
+                symmetric_path_len = len(self.view.shortest_path(source, cache)) + \
+                                     len(self.view.shortest_path(cache, receiver)) - 2
+                multicast_path_len = len(self.view.shortest_path(source, fork_node)) + \
+                                     len(self.view.shortest_path(fork_node, cache)) + \
+                                     len(self.view.shortest_path(fork_node, receiver)) - 3
+
+                self.controller.put_content(cache)
+                # If symmetric and multicast have equal cost, choose symmetric
+                # because of easier packet processing
+                if symmetric_path_len <= multicast_path_len:  # use symmetric delivery
+                    # Symmetric delivery
+                    self.controller.forward_content_path(source, cache, main_path=True)
+                    self.controller.forward_content_path(cache, receiver, main_path=True)
+                else:
+                    # Multicast delivery
+                    self.controller.forward_content_path(source, receiver, main_path=True)
+                    # self.controller.forward_content_path(fork_node, cache, main_path=False)
+                    
+                    # multicast to cache only if stretch is under threshold
+                    if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch:#checks the threshold
+                        self.controller.forward_content_path(fork_node, cache, main_path=False)
+                        self.controller.put_content(cache)
+                
+                    
         self.controller.end_session()

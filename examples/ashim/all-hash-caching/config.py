@@ -51,7 +51,7 @@ DATA_COLLECTORS = ['CACHE_HIT_RATIO', 'LATENCY', 'LINK_LOAD']#, 'PATH_STRETCH']
 ALPHA = [0.6, 0.8, 1.0, 1.2]
 
 # Total size of network cache as a fraction of content population
-NETWORK_CACHE = [ 0.01, .05, 0.1, 0.2] # 1%, 5%, 10%, 20%
+NETWORK_CACHE = [0.0004, 0.002, 0.01, 0.05]#[ 0.002, 0.01, .05, 0.1, 0.2] #.2%, 1%, 5%, 10%, 20%
 
 #.004,.002,.01,.05
 
@@ -72,17 +72,17 @@ N_MEASURED_REQUESTS = 4 * 10 ** 4
 # List of all implemented topologies
 # Topology implementations are located in ./icarus/scenarios/topology.py
 TOPOLOGIES = [
-        'GEANT',
+        'GEANT', # problem for cluster 
         'WIDE',
         'GARR',
-        #'TISCALI',#prob for hash_edge
+        'TISCALI',#prob for hash_edge
               ]
 
 # List of caching and routing strategies
 # The code is located in ./icarus/models/strategy.py
 STRATEGIES = [
     
-      'LCE',  # Leave Copy Everywhere
+     # 'LCE',  # Leave Copy Everywhere
      # #'NO_CACHE',  # No caching, shorest-path routing
      # 'CL4M',  # Cache less for more
      # 'PROB_CACHE',  # ProbCache
@@ -90,15 +90,17 @@ STRATEGIES = [
      # 'RAND_CHOICE',  # Random choice: cache in one random cache on path
 
      
-     #  # 'HR_SYMM',  # Symmetric hash-routing
-     #  # 'HR_ASYMM',  # Asymmetric hash-routing
-       'HR_MULTICAST',  # Multicast hash-routing
-     # # 'HR_HYBRID_AM',  # Hybrid Asymm-Multicast hash-routing
-     #  'HR_HYBRID_SM',  # Hybrid Symm-Multicast hash-routing
-     
-       #'HR_EDGE_CACHE',
-      # 'HR_ON_PATH',
-       'HR_CLUSTER',
+     #'HR_SYMM',  # Symmetric hash-routing
+     #'HR_ASYMM',  # Asymmetric hash-routing
+     #'HR_MULTICAST',  # Multicast hash-routing
+     'HR_HYBRID_AM',  # Hybrid Asymm-Multicast hash-routing
+     'HR_HYBRID_SM',  # Hybrid Symm-Multicast hash-routing
+     #'ASHIM_HR_HYBRID_AM',
+     'ASHIM_HR_HYBRID_SM',
+     #'SERVER_ASHIM_HR_HYBRID_SM',
+     # 'HR_EDGE_CACHE',
+     # 'HR_ON_PATH',
+      #'HR_CLUSTER',
      
              ]
 
@@ -159,10 +161,11 @@ for alpha in ALPHA:
                 experiment = copy.deepcopy(default)
                 experiment['workload']['alpha'] = alpha
                 experiment['strategy']['name'] = strategy
-                #experiment['topology']['name'] = topology# JAPAN
+                experiment['topology']['name'] = topology # JAPAN
                 
-                if experiment['strategy']['name'] == "HR_CLUSTER":
+                if experiment['strategy']['name'] == 'HR_CLUSTER':
                     experiment['cache_placement']['name'] = 'CLUSTERED_HASHROUTING'
+                    #print("CHECKEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
                         
                         
                 # experiment['topology']['name'] = 'PATH'

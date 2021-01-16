@@ -44,7 +44,7 @@ PLOT_EMPTY_GRAPHS = True
 STRATEGY_STYLE = {
          #'HR_SYMM':         'b-o',
          #'HR_ASYMM':        'g-D',
-         #'HR_MULTICAST':    'm-^',
+         'HR_MULTICAST':    'm-^',
          'ASHIM_HBHC':    'b-o',
          'ASHIM_HBLB':    'm-^',
          #'HR_HYBRID_AM':    'c-s', 
@@ -69,7 +69,7 @@ STRATEGY_LEGEND = {
          'LCD':             'LCD',
          #'HR_SYMM':         'HR Symm',
          #'HR_ASYMM':        'HR Asymm',
-         #'HR_MULTICAST':    'HR Multicast',
+         'HR_MULTICAST':    'HR Multicast',
         #'HR_HYBRID_AM':    'HR Hybrid AM',
          #'HR_HYBRID_SM':    'HR Hybrid SM',
          'CL4M':            'CL4M',

@@ -45,8 +45,13 @@ STRATEGY_STYLE = {
          'HR_SYMM':         'b-o',
          'HR_ASYMM':        'g-D',
          'HR_MULTICAST':    'm-^',
+         
          'HR_HYBRID_AM':    'c-s', 
+         'ASHIM_HR_HYBRID_AM':    'g-s', 
          'HR_HYBRID_SM':    'r-v',
+         'ASHIM_HR_HYBRID_SM':    'b-D',
+         'SERVER_ASHIM_HR_HYBRID_SM':'m-^',
+         
           'LCE':             'b--p',
           'LCD':             'g-->',
           'CL4M':            'p--<',
@@ -63,9 +68,13 @@ STRATEGY_LEGEND = {
          'HR_SYMM':         'HR Symm',
          'HR_ASYMM':        'HR Asymm',
          'HR_MULTICAST':    'HR Multicast',
+         
          'HR_HYBRID_AM':    'HR Hybrid AM',
+         'ASHIM_HR_HYBRID_AM': 'ASHIM HR Hybrid AM',
          'HR_HYBRID_SM':    'HR Hybrid SM',
-          
+         'ASHIM_HR_HYBRID_SM': 'ASHIM HR Hybrid SM',
+         'SERVER_ASHIM_HR_HYBRID_SM' : 'SERVER ASHIM HR Hybrid SM',
+         
           'LCD':            'LCD',
           'LCE':            'LCE',
           'CL4M':            'CL4M',
@@ -77,7 +86,7 @@ STRATEGY_LEGEND = {
           
          'HR_EDGE_CACHE' :   'HR Edge',
          'HR_ON_PATH':       'HR OnPath',
-         'HR_CLUSTER':       'Ashim HR Cluster',
+         'HR_CLUSTER':       'HR Cluster',
                     }
 
 # Color and hatch styles for bar charts of cache hit ratio and link load vs topology
@@ -85,8 +94,12 @@ STRATEGY_BAR_COLOR = {
     'HR_SYMM':         'k',
     'HR_ASYMM':        '0.2',
     'HR_MULTICAST':    '0.3',
+    
     'HR_HYBRID_AM':    '0.4',
+    'ASHIM_HR_HYBRID_AM':    '0.2',
     'HR_HYBRID_SM':    '0.5',
+    'ASHIM_HR_HYBRID_SM': '0.8',
+    'SERVER_ASHIM_HR_HYBRID_SM': '0.9',
     
     'LCD':            '0.1',
     'LCE':            '0.6',
@@ -95,7 +108,7 @@ STRATEGY_BAR_COLOR = {
     'RAND_CHOICE':     '0.9',
     
      'HR_EDGE_CACHE' :   '0.6',
-    # 'HR_ON_PATH':       '0.7',
+     'HR_ON_PATH':       '0.7',
      'HR_CLUSTER':       '0.81',
     }
 
@@ -103,8 +116,12 @@ STRATEGY_BAR_HATCH = {
     'HR_SYMM':         None,
     'HR_ASYMM':        '//',
     'HR_MULTICAST':    'x',
+    
     'HR_HYBRID_AM':    '+',
+    'ASHIM_HR_HYBRID_AM':    '-',
     'HR_HYBRID_SM':    '\\',
+    'ASHIM_HR_HYBRID_SM': 'o',
+    'SERVER_ASHIM_HR_HYBRID_SM':'x',
     
     'LCD':            'p',
     'LCE':            'd',
