@@ -52,7 +52,7 @@ STRATEGY_STYLE = {
         #'HR_HYBRID_SM':    'r-v',
          'LCE':             'b--p',
          'LCD':             'g-->',
-         'CL4M':            'g--<',
+         'CL4M':            'm--<',
          'PROB_CACHE':      'c--<',
          'RAND_CHOICE':     'r--<',
          #'RAND_BERNOULLI':  'g--*',
@@ -117,7 +117,7 @@ def plot_cache_hits_vs_alpha(resultset, topology, cache_size, alpha_range, strat
     desc['line_style'] = STRATEGY_STYLE
     desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
-    plot_lines(resultset, desc, 'CACHE_HIT_RATIO_T=%s@C=%s.pdf'
+    plot_lines(resultset, desc, 'CACHE_HIT_RATIO_T=%s@C=%s.png'
                % (topology, cache_size), plotdir)
 
 
@@ -141,7 +141,7 @@ def plot_cache_hits_vs_cache_size(resultset, topology, alpha, cache_size_range, 
     desc['line_style'] = STRATEGY_STYLE
     desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
-    plot_lines(resultset, desc, 'CACHE_HIT_RATIO_T=%s@A=%s.pdf'
+    plot_lines(resultset, desc, 'CACHE_HIT_RATIO_T=%s@A=%s.png'
                % (topology, alpha), plotdir)
 
 
@@ -162,7 +162,7 @@ def plot_link_load_vs_alpha(resultset, topology, cache_size, alpha_range, strate
     desc['line_style'] = STRATEGY_STYLE
     desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
-    plot_lines(resultset, desc, 'LINK_LOAD_INTERNAL_T=%s@C=%s.pdf'
+    plot_lines(resultset, desc, 'LINK_LOAD_INTERNAL_T=%s@C=%s.png'
                % (topology, cache_size), plotdir)
 
 
@@ -184,7 +184,7 @@ def plot_link_load_vs_cache_size(resultset, topology, alpha, cache_size_range, s
     desc['line_style'] = STRATEGY_STYLE
     desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
-    plot_lines(resultset, desc, 'LINK_LOAD_INTERNAL_T=%s@A=%s.pdf'
+    plot_lines(resultset, desc, 'LINK_LOAD_INTERNAL_T=%s@A=%s.png'
                % (topology, alpha), plotdir)
 
 
@@ -205,7 +205,7 @@ def plot_latency_vs_alpha(resultset, topology, cache_size, alpha_range, strategi
     desc['line_style'] = STRATEGY_STYLE
     desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
-    plot_lines(resultset, desc, 'LATENCY_T=%s@C=%s.pdf'
+    plot_lines(resultset, desc, 'LATENCY_T=%s@C=%s.png'
                % (topology, cache_size), plotdir)
 
 
@@ -228,7 +228,7 @@ def plot_latency_vs_cache_size(resultset, topology, alpha, cache_size_range, str
     desc['line_style'] = STRATEGY_STYLE
     desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
-    plot_lines(resultset, desc, 'LATENCY_T=%s@A=%s.pdf'
+    plot_lines(resultset, desc, 'LATENCY_T=%s@A=%s.png'
                % (topology, alpha), plotdir)
 
 
@@ -258,7 +258,7 @@ def plot_cache_hits_vs_topology(resultset, alpha, cache_size, topology_range, st
     desc['bar_hatch'] = STRATEGY_BAR_HATCH
     desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
-    plot_bar_chart(resultset, desc, 'CACHE_HIT_RATIO_A=%s_C=%s.pdf'
+    plot_bar_chart(resultset, desc, 'CACHE_HIT_RATIO_A=%s_C=%s.png'
                    % (alpha, cache_size), plotdir)
 
 
@@ -286,7 +286,7 @@ def plot_link_load_vs_topology(resultset, alpha, cache_size, topology_range, str
     desc['bar_hatch'] = STRATEGY_BAR_HATCH
     desc['legend'] = STRATEGY_LEGEND
     desc['plotempty'] = PLOT_EMPTY_GRAPHS
-    plot_bar_chart(resultset, desc, 'LINK_LOAD_INTERNAL_A=%s_C=%s.pdf'
+    plot_bar_chart(resultset, desc, 'LINK_LOAD_INTERNAL_A=%s_C=%s.png'
                    % (alpha, cache_size), plotdir)
 
 

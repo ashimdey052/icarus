@@ -79,9 +79,9 @@ TOPOLOGIES = [
 # List of caching and routing strategies
 # The code is located in ./icarus/models/strategy.py
 STRATEGIES = [
-    'ASHIM_CLOSENESS',
-    'ASHIM_HBLB',
-    'ASHIM_HBHC',
+    #'ASHIM_CLOSENESS',
+    #'ASHIM_HBLB',
+    #'ASHIM_HBHC',
      'LCE',  # Leave Copy Everywhere
      'NO_CACHE',  # No caching, shorest-path routing
      #'HR_SYMM',  # Symmetric hash-routing

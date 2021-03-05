@@ -58,7 +58,9 @@ STRATEGY_STYLE = {
           'PROB_CACHE':      'c--<',
           'RAND_CHOICE':     'r-->',
           'HR_EDGE_CACHE' :   'b--<',
-         # 'HR_ON_PATH':       'c-->',
+         #'HR_ON_PATH':       'c-->',
+          'HR_ON_PATH_CL4M':      'g-->',
+          'HR_ON_PATH_LCD':      'r-->',
           'HR_CLUSTER':       'r--<',
                 }
 
@@ -86,6 +88,8 @@ STRATEGY_LEGEND = {
           
          'HR_EDGE_CACHE' :   'HR Edge',
          'HR_ON_PATH':       'HR OnPath',
+         'HR_ON_PATH_CL4M':       'HR OnPath CL4M',
+         'HR_ON_PATH_LCD':       'HR OnPath LCD',
          'HR_CLUSTER':       'HR Cluster',
                     }
 
@@ -109,6 +113,8 @@ STRATEGY_BAR_COLOR = {
     
      'HR_EDGE_CACHE' :   '0.6',
      'HR_ON_PATH':       '0.7',
+     'HR_ON_PATH_CL4M':       '0.75',
+     'HR_ON_PATH_LCD':       '0.4',
      'HR_CLUSTER':       '0.81',
     }
 
@@ -132,6 +138,8 @@ STRATEGY_BAR_HATCH = {
     
     'HR_EDGE_CACHE' :   '*',
     'HR_ON_PATH':       '#',
+    'HR_ON_PATH_CL4M':       'x',
+    'HR_ON_PATH_LCD':       '//',
     'HR_CLUSTER':       'o',
     }
 
