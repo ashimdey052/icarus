@@ -101,7 +101,7 @@ STRATEGIES = [
      # 'HR_EDGE_CACHE',
      # 'HR_ON_PATH',
      'HR_ON_PATH_LCD',
-     #'HR_ON_PATH_CL4M',
+     'HR_ON_PATH_MCD',
      #'HR_CLUSTER',
      
              ]

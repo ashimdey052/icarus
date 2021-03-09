@@ -842,3 +842,8 @@ class NetworkController(object):
         """
         if node in self.model.local_cache:
             return self.model.local_cache[node].put(self.session['content'])
+    
+    #Ashim Implemented
+    def remove_content_local_cache(self, node):
+        if node in self.model.local_cache:
+            return self.model.local_cache[node].remove(self.session['content'])
