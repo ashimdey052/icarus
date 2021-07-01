@@ -51,16 +51,17 @@ STRATEGY_STYLE = {
          'HR_HYBRID_SM':    'r-v',
          'ASHIM_HR_HYBRID_SM':    'b-D',
          'SERVER_ASHIM_HR_HYBRID_SM':'m-^',
-         
+         'HR_ON_PATH_LCD_FORK' : 'c--<',
           'LCE':             'b--p',
           'LCD':             'g-->',
-          'CL4M':            'p--<',
+          'CL4M':            'r--<',
           'PROB_CACHE':      'c--<',
           'RAND_CHOICE':     'r-->',
           'HR_EDGE_CACHE' :   'b--<',
          #'HR_ON_PATH':       'c-->',
           'HR_ON_PATH_MCD':      'g-->',
-          'HR_ON_PATH_LCD':      'r-->',
+          'HR_ON_PATH_LCD':      'b--p',
+          'HR_ON_PATH_CL4M': 'm-^',
           'HR_CLUSTER':       'r--<',
                 }
 
@@ -90,7 +91,9 @@ STRATEGY_LEGEND = {
          'HR_ON_PATH':       'HR OnPath',
          'HR_ON_PATH_MCD':       'HR OnPath MCD',
          'HR_ON_PATH_LCD':       'HR OnPath LCD',
+         'HR_ON_PATH_CL4M': 'HR OnPath CL4M',
          'HR_CLUSTER':       'HR Cluster',
+         'HR_ON_PATH_LCD_FORK' : 'HR OnPath LCD Fork',
                     }
 
 # Color and hatch styles for bar charts of cache hit ratio and link load vs topology
@@ -104,6 +107,7 @@ STRATEGY_BAR_COLOR = {
     'HR_HYBRID_SM':    '0.5',
     'ASHIM_HR_HYBRID_SM': '0.8',
     'SERVER_ASHIM_HR_HYBRID_SM': '0.9',
+    'HR_ON_PATH_LCD_FORK' : '0.25',
     
     'LCD':            '0.1',
     'LCE':            '0.6',
@@ -115,6 +119,7 @@ STRATEGY_BAR_COLOR = {
      'HR_ON_PATH':       '0.7',
      'HR_ON_PATH_MCD':       '0.75',
      'HR_ON_PATH_LCD':       '0.4',
+     'HR_ON_PATH_CL4M': '0.33',
      'HR_CLUSTER':       '0.81',
     }
 
@@ -128,6 +133,8 @@ STRATEGY_BAR_HATCH = {
     'HR_HYBRID_SM':    '\\',
     'ASHIM_HR_HYBRID_SM': 'o',
     'SERVER_ASHIM_HR_HYBRID_SM':'x',
+    'HR_ON_PATH_LCD_FORK' : '//',
+    'HR_ON_PATH_CL4M': 'x',
     
     'LCD':            'p',
     'LCE':            'd',
@@ -139,7 +146,7 @@ STRATEGY_BAR_HATCH = {
     'HR_EDGE_CACHE' :   '*',
     'HR_ON_PATH':       '#',
     'HR_ON_PATH_MCD':       'x',
-    'HR_ON_PATH_LCD':       '//',
+    'HR_ON_PATH_LCD':       'o',
     'HR_CLUSTER':       'o',
     }
 

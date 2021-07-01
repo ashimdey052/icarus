@@ -96,12 +96,14 @@ STRATEGIES = [
      #'HR_HYBRID_AM',  # Hybrid Asymm-Multicast hash-routing
      #'HR_HYBRID_SM',  # Hybrid Symm-Multicast hash-routing
      #'ASHIM_HR_HYBRID_AM',
-     'ASHIM_HR_HYBRID_SM',
+     #'ASHIM_HR_HYBRID_SM',
      #'SERVER_ASHIM_HR_HYBRID_SM',
      # 'HR_EDGE_CACHE',
      # 'HR_ON_PATH',
      'HR_ON_PATH_LCD',
-     'HR_ON_PATH_MCD',
+     #'HR_ON_PATH_MCD',
+     'HR_ON_PATH_LCD_FORK',
+     #'HR_ON_PATH_CL4M',
      #'HR_CLUSTER',
      
              ]

@@ -296,7 +296,7 @@ class HashroutingEdge(BaseHashrouting):
         self.controller.end_session()
 
 
-@register_strategy('HR_ON_PATH')
+@register_strategy('HR_ON_PATH') # MULTICAST_LCE(between_authorative_to_requester)
 class HashroutingOnPath(BaseHashrouting):
     """Hybrid hash-routing and on-path caching.
 
@@ -707,7 +707,7 @@ class HashroutingHybridAM(BaseHashrouting):
             if not self.controller.get_content(source):
                 raise RuntimeError('The content was not found at the expected source')
 
-            if cache in self.view.shortest_path(source, receiver):
+            if cache in self.view.shortest_path(source, receiver):#symetric path
                 # Forward to cache
                 self.controller.forward_content_path(source, cache)
                 # Insert in cache
@@ -726,9 +726,9 @@ class HashroutingHybridAM(BaseHashrouting):
                         break
                 else:
                     fork_node = cache
-                self.controller.forward_content_path(source, receiver, main_path=True)
+                self.controller.forward_content_path(source, receiver, main_path=True)#asymetric path
                 # multicast to cache only if stretch is under threshold
-                if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch:#checks the threshold
+                if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch:#multicast_checks the threshold
                     self.controller.forward_content_path(fork_node, cache, main_path=False)
                     self.controller.put_content(cache)
         self.controller.end_session()
@@ -1178,10 +1178,10 @@ class AshimHashroutingHybridSM(BaseHashrouting):
                     self.controller.forward_content_path(cache, receiver, main_path=True)
                 else:
                     # Multicast delivery
-                    self.controller.forward_content_path(source, receiver, main_path=True)
+                    self.controller.forward_content_path(source, receiver, main_path=True) # use asymmetric delivery
                     # self.controller.forward_content_path(fork_node, cache, main_path=False)
                     
-                    # multicast to cache only if stretch is under threshold
+                    # multicast to cache only if stretch is under threshold    # use conditional multicast
                     if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch:#checks the threshold
                         self.controller.forward_content_path(fork_node, cache, main_path=False)
                         self.controller.put_content(cache)
@@ -1320,7 +1320,7 @@ class ServerAshimHashroutingHybridSM(BaseHashrouting):
         
         
         
-@register_strategy('HR_ON_PATH_LCD') #2nd till 28/02
+@register_strategy('HR_ON_PATH_LCD') #2nd till 28/02****
 class HashroutingOnPathLCD(BaseHashrouting):
     """Hybrid hash-routing and on-path caching.
 
@@ -1335,7 +1335,7 @@ class HashroutingOnPathLCD(BaseHashrouting):
            University College London, Dec. 2015. Available:
            http://discovery.ucl.ac.uk/1473436/
     """
-    def __init__(self, view, controller, on_path_cache_ratio=0.2, max_stretch=0.2, **kwargs):
+    def __init__(self, view, controller, on_path_cache_ratio=0.1, max_stretch=0.2, **kwargs):
         """Constructor
 
         Parameters
@@ -1406,7 +1406,7 @@ class HashroutingOnPathLCD(BaseHashrouting):
             return
         # Here I need to see whether I need symm, asymm or multicast delivery[as direct return =false]
         
-        if cache in self.view.shortest_path(serving_node, receiver):
+        if cache in self.view.shortest_path(serving_node, receiver): #symetric delivery
                 self.controller.forward_content_path(serving_node, cache)
                 # Insert in cache
                 self.controller.put_content(cache)
@@ -1435,18 +1435,19 @@ class HashroutingOnPathLCD(BaseHashrouting):
                 #self.controller.put_content(cache)
                 # If symmetric and multicast have equal cost, choose symmetric
                 # because of easier packet processing
-                if symmetric_path_len <= multicast_path_len:  # use symmetric delivery
+                
+                if symmetric_path_len <= multicast_path_len:  # symmetric delivery
                     # Symmetric delivery
                     self.controller.forward_content_path(serving_node, cache, main_path=True)
                     self.controller.put_content(cache)
                     self.controller.forward_content_path(cache, receiver, main_path=True)
                 else:
                     # Multicast delivery
-                    self.controller.forward_content_path(serving_node, receiver, main_path=True)
+                    self.controller.forward_content_path(serving_node, receiver, main_path=True) #Asymmetric Delivery
                     # self.controller.forward_content_path(fork_node, cache, main_path=False)
                     
                     # multicast to cache only if stretch is under threshold
-                    if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch:#checks the threshold
+                    if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch: #Multicast Delivery
                         self.controller.forward_content_path(fork_node, cache, main_path=False)
                         self.controller.put_content(cache)
                     
@@ -1603,12 +1604,15 @@ class HashroutingOnPathCL4M(BaseHashrouting):
                     # Multicast delivery
                     self.controller.forward_content_path(serving_node, receiver, main_path=True)
                     # self.controller.forward_content_path(fork_node, cache, main_path=False)
-                    
+                    des_copy=False
+                    if designated_cache in self.view.shortest_path(serving_node, receiver): 
+                            self.controller.put_content_local_cache(designated_cache)
+                            des_copy= True
                     # multicast to cache only if stretch is under threshold
                     if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch:#checks the threshold
                         self.controller.forward_content_path(fork_node, cache, main_path=False)
                         self.controller.put_content(cache)
-                        if (designated_cache in self.view.shortest_path(serving_node, cache)) or (designated_cache in self.view.shortest_path(fork_node, receiver)): 
+                        if (des_copy==False and designated_cache in self.view.shortest_path(fork_node, cache)): 
                             self.controller.put_content_local_cache(designated_cache)#######################
                     
                     
@@ -1747,6 +1751,325 @@ class HashroutingOnPathMCD(BaseHashrouting):
                     if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch:#checks the threshold
                         self.controller.forward_content_path(fork_node, cache, main_path=False)
                         self.controller.put_content(cache)
+                    
+                    
+        self.controller.end_session()
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+#05/04/2021
+
+@register_strategy('HR_ON_PATH_MCD_CL4M') #CL4M(source,cache),MCD(cache,requester)
+class HashroutingOnPathMCDCL4M(BaseHashrouting):
+    """Hybrid hash-routing and on-path caching.
+
+    This strategy differs from HashroutingEdge for the fact that in
+    HashroutingEdge, the local fraction of the cache is queried only by traffic
+    of endpoints directly attached to the caching node. In HashroutingOnPath
+    the local cache is queried by all traffic being forwarded by the node.
+
+    References
+    ----------
+    .. [2] L. Saino, On the Design of Efficient Caching Systems, Ph.D. thesis
+           University College London, Dec. 2015. Available:
+           http://discovery.ucl.ac.uk/1473436/
+    """
+    def __init__(self, view, controller, on_path_cache_ratio=0.1, max_stretch=0.2, use_ego_betw=False, **kwargs):
+        """Constructor
+
+        Parameters
+        ----------
+        view : NetworkView
+            An instance of the network view
+        controller : NetworkController
+            An instance of the network controller
+        routing : str
+            Content routing scheme: SYMM, ASYMM or MULTICAST
+        on_path_cache_ratio : float [0, 1]
+            Ratio of cache allocated to uncoordinated on-path cache
+        """
+        if on_path_cache_ratio < 0 or on_path_cache_ratio > 1:
+            raise ValueError('on_path_cache_ratio must be between 0 and 1')
+        super(HashroutingOnPathMCDCL4M, self).__init__(view, controller)
+        self.max_stretch = nx.diameter(view.topology()) * max_stretch
+        self.controller.reserve_local_cache(on_path_cache_ratio)#by_default_minimum = 0.1
+        
+        
+        
+        topology = view.topology()
+        if use_ego_betw:
+            self.betw = dict((v, nx.betweenness_centrality(nx.ego_graph(topology, v))[v])
+                             for v in topology.nodes())
+        else:
+            self.betw = nx.betweenness_centrality(topology)
+
+    @inheritdoc(Strategy)
+    def process_event(self, time, receiver, content, log):
+        # get all required data
+        source = self.view.content_source(content)
+        cache = self.authoritative_cache(content)
+        # handle (and log if required) actual request
+        self.controller.start_session(time, receiver, content, log)
+        # Forward request to authoritative cache and check all local caches on path
+        path = self.view.shortest_path(receiver, cache)
+        for u, v in path_links(path):
+            self.controller.forward_request_hop(u, v)
+            if v != cache:
+                if self.controller.get_content_local_cache(v):
+                    serving_node = v
+                    direct_return = True
+                    break
+        else:
+            # No cache hits from local caches on path, query authoritative cache
+            if self.controller.get_content(cache):
+                serving_node = v
+                direct_return = True
+            else:
+                max_betw = -1
+                designated_cache = None
+                path = self.view.shortest_path(cache, source)
+                for u, v in path_links(path):
+                    self.controller.forward_request_hop(u, v)
+                    if v != source:
+                        if self.controller.get_content_local_cache(v):
+                            serving_node = v
+                            direct_return = False # cache node par kore paise
+                            break
+                        else:
+                            if self.betw[v] > max_betw:
+                                max_betw = self.betw[v]
+                                designated_cache = v
+                else:
+                    # No hits from local caches in cache -> source path
+                    # Get content from the source
+                    self.controller.get_content(source)
+                    serving_node = source
+                    direct_return = False
+        # Now we have a serving node, let's return the content, while storing
+        # it on all opportunistic caches on the path
+        if direct_return: # Flase know by default
+            # Here I just need to return the content directly to the user
+            path = list(reversed(self.view.shortest_path(receiver, serving_node)))
+            copied  = False
+            for u, v in path_links(path):
+                self.controller.forward_content_hop(u, v)
+                if copied== False and v != receiver:
+                    ##MCD
+                    #if serving_node!=cache:
+                        #self.controller.remove_content_local_cache(serving_node)
+                    ##MCD
+                    self.controller.put_content_local_cache(v)
+                    copied=True
+            self.controller.end_session()
+            return
+        # Here I need to see whether I need symm, asymm or multicast delivery[as direct return =false]
+        
+        if cache in self.view.shortest_path(serving_node, receiver):
+                self.controller.forward_content_path(serving_node, cache)
+                
+                self.controller.put_content_local_cache(designated_cache)##### put CL4M
+                
+                # Insert in cache
+                self.controller.put_content(cache)
+                # Forward to receiver
+                self.controller.forward_content_path(cache, receiver)
+        
+        else:
+                # Multicast
+                cache_path = self.view.shortest_path(serving_node, cache)
+                recv_path = self.view.shortest_path(serving_node, receiver)
+
+                # find what is the node that has to fork the content flow
+                for i in range(1, min([len(cache_path), len(recv_path)])):
+                    if cache_path[i] != recv_path[i]:
+                        fork_node = cache_path[i - 1]
+                        break
+                else:
+                    fork_node = cache
+
+                symmetric_path_len = len(self.view.shortest_path(serving_node, cache)) + \
+                                     len(self.view.shortest_path(cache, receiver)) - 2
+                multicast_path_len = len(self.view.shortest_path(serving_node, fork_node)) + \
+                                     len(self.view.shortest_path(fork_node, cache)) + \
+                                     len(self.view.shortest_path(fork_node, receiver)) - 3
+
+                #self.controller.put_content(cache)
+                # If symmetric and multicast have equal cost, choose symmetric
+                # because of easier packet processing
+                if symmetric_path_len <= multicast_path_len:  # use symmetric delivery
+                    # Symmetric delivery
+                    self.controller.forward_content_path(serving_node, cache, main_path=True)
+                    self.controller.put_content_local_cache(designated_cache)##### put CL4M
+                    self.controller.put_content(cache)
+                    self.controller.forward_content_path(cache, receiver, main_path=True)
+                else:
+                    # Multicast delivery
+                    self.controller.forward_content_path(serving_node, receiver, main_path=True)
+                    # self.controller.forward_content_path(fork_node, cache, main_path=False)
+                    des_copy=False
+                    if designated_cache in self.view.shortest_path(serving_node, receiver):
+                        self.controller.put_content_local_cache(designated_cache)##### put CL4M
+                        des_copy=True
+                    
+                    # multicast to cache only if stretch is under threshold
+                    if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch:#checks the threshold
+                        self.controller.forward_content_path(fork_node, cache, main_path=False)
+                        self.controller.put_content(cache)
+                        
+                        if (des_copy==False and designated_cache in self.view.shortest_path(fork_node, cache)):
+                            self.controller.put_content_local_cache(designated_cache)##### put CL4M
+                    
+                    
+        self.controller.end_session()
+        
+        
+        
+        
+        
+@register_strategy('HR_ON_PATH_LCD_FORK') #2nd till 28/02****
+class HashroutingOnPathLCDFork(BaseHashrouting):
+    """Hybrid hash-routing and on-path caching.
+
+    This strategy differs from HashroutingEdge for the fact that in
+    HashroutingEdge, the local fraction of the cache is queried only by traffic
+    of endpoints directly attached to the caching node. In HashroutingOnPath
+    the local cache is queried by all traffic being forwarded by the node.
+
+    References
+    ----------
+    .. [2] L. Saino, On the Design of Efficient Caching Systems, Ph.D. thesis
+           University College London, Dec. 2015. Available:
+           http://discovery.ucl.ac.uk/1473436/
+    """
+    def __init__(self, view, controller, on_path_cache_ratio=0.1, max_stretch=0.2, **kwargs):
+        """Constructor
+
+        Parameters
+        ----------
+        view : NetworkView
+            An instance of the network view
+        controller : NetworkController
+            An instance of the network controller
+        routing : str
+            Content routing scheme: SYMM, ASYMM or MULTICAST
+        on_path_cache_ratio : float [0, 1]
+            Ratio of cache allocated to uncoordinated on-path cache
+        """
+        if on_path_cache_ratio < 0 or on_path_cache_ratio > 1:
+            raise ValueError('on_path_cache_ratio must be between 0 and 1')
+        super(HashroutingOnPathLCDFork, self).__init__(view, controller)
+        self.max_stretch = nx.diameter(view.topology()) * max_stretch
+        self.controller.reserve_local_cache(on_path_cache_ratio)#by_default_minimum = 0.1
+
+    @inheritdoc(Strategy)
+    def process_event(self, time, receiver, content, log):
+        # get all required data
+        source = self.view.content_source(content)
+        cache = self.authoritative_cache(content)
+        # handle (and log if required) actual request
+        self.controller.start_session(time, receiver, content, log)
+        # Forward request to authoritative cache and check all local caches on path
+        path = self.view.shortest_path(receiver, cache)
+        for u, v in path_links(path):
+            self.controller.forward_request_hop(u, v)
+            if v != cache:
+                if self.controller.get_content_local_cache(v):
+                    serving_node = v
+                    direct_return = True
+                    break
+        else:
+            # No cache hits from local caches on path, query authoritative cache
+            if self.controller.get_content(cache):
+                serving_node = v
+                direct_return = True
+            else:
+                path = self.view.shortest_path(cache, source)
+                for u, v in path_links(path):
+                    self.controller.forward_request_hop(u, v)
+                    if v != source:
+                        if self.controller.get_content_local_cache(v):
+                            serving_node = v
+                            direct_return = False # cache node par kore paise
+                            break
+                else:
+                    # No hits from local caches in cache -> source path
+                    # Get content from the source
+                    self.controller.get_content(source)
+                    serving_node = source
+                    direct_return = False
+        # Now we have a serving node, let's return the content, while storing
+        # it on all opportunistic caches on the path
+        if direct_return: # Flase know by default
+            # Here I just need to return the content directly to the user
+            path = list(reversed(self.view.shortest_path(receiver, serving_node)))
+            copied  = False
+            for u, v in path_links(path):
+                self.controller.forward_content_hop(u, v)
+                if copied== False and v != receiver:
+                    self.controller.put_content_local_cache(v)
+                    copied=True
+            self.controller.end_session()
+            return
+        # Here I need to see whether I need symm, asymm or multicast delivery[as direct return =false]
+        
+        if cache in self.view.shortest_path(serving_node, receiver): #symetric delivery
+                self.controller.forward_content_path(serving_node, cache)
+                # Insert in cache
+                self.controller.put_content(cache)
+                # Forward to receiver
+                self.controller.forward_content_path(cache, receiver)
+        
+        else:
+                # Multicast
+                cache_path = self.view.shortest_path(serving_node, cache)
+                recv_path = self.view.shortest_path(serving_node, receiver)
+
+                # find what is the node that has to fork the content flow
+                for i in range(1, min([len(cache_path), len(recv_path)])):
+                    if cache_path[i] != recv_path[i]:
+                        fork_node = cache_path[i - 1]
+                        break
+                else:
+                    fork_node = cache
+
+                symmetric_path_len = len(self.view.shortest_path(serving_node, cache)) + \
+                                     len(self.view.shortest_path(cache, receiver)) - 2
+                multicast_path_len = len(self.view.shortest_path(serving_node, fork_node)) + \
+                                     len(self.view.shortest_path(fork_node, cache)) + \
+                                     len(self.view.shortest_path(fork_node, receiver)) - 3
+
+                #self.controller.put_content(cache)
+                # If symmetric and multicast have equal cost, choose symmetric
+                # because of easier packet processing
+                
+                if symmetric_path_len <= multicast_path_len:  # symmetric delivery
+                    # Symmetric delivery
+                    self.controller.forward_content_path(serving_node, cache, main_path=True)
+                    self.controller.put_content(cache)
+                    self.controller.forward_content_path(cache, receiver, main_path=True)
+                else:
+                    # Multicast delivery
+                    self.controller.forward_content_path(serving_node, receiver, main_path=True) #Asymmetric Delivery
+                    # self.controller.forward_content_path(fork_node, cache, main_path=False)
+                    
+                    # multicast to cache only if stretch is under threshold
+                    if len(self.view.shortest_path(fork_node, cache)) - 1 < self.max_stretch: #Multicast Delivery
+                        self.controller.forward_content_path(fork_node, cache, main_path=False)
+                        self.controller.put_content(cache)
+                    else:
+                        self.controller.put_content_local_cache(fork_node)
                     
                     
         self.controller.end_session()
